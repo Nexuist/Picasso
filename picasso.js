@@ -9,7 +9,8 @@ let load = (page) => window.loadURL(`file:///${__dirname}/${page}.html`);
 function start() {
 	window = new BrowserWindow({
 		minWidth: 640,
-		minHeight: 480
+		minHeight: 480,
+		backgroundColor: "#f5f5f5"
 	});
 	load("start");
 	window.on("close", () => {

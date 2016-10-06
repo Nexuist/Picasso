@@ -2,11 +2,12 @@ const {remote, ipcRenderer} = require('electron');
 const dialog = remote.dialog;
 const browserWindow = remote.getCurrentWindow();
 
-function makeSelection(folderPath) {
-	alert("MADE SELECTION: " + folderPath);
-}
+let makeSelection = (folderPath) => ipcRenderer.send("processFolder", folderPath);
 
 window.onload = () => {
+
+	document.ondragstart = () => console.log("drag");
+
 	document.ondragover = document.ondrop = (event) => event.preventDefault(); // By default, the browser location will be changed to the file path of the object dragged in. We don't want that
 
 	document.body.ondrop = (event) => {

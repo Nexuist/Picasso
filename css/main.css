@@ -1,0 +1,25 @@
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .2s
+}
+.fade-enter, .fade-leave-active {
+  opacity: 0
+}
+
+.test-overlay {
+	position: absolute;
+	top: -100%;
+	left: -100%;
+	background: red;
+	width: 250%;
+	height: 215%;
+	z-index: 0;
+}
+
+progress.catalog {
+	width: 80%;
+	margin-left: 10%;
+}
+
+h5.upload {
+	margin-top: 20px;
+}

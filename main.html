@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<link rel="stylesheet" href="css/bulma.min.css" type="text/css" />
+		<link rel="stylesheet" href="css/font-awesome.min.css" type="text/css" />
+		<link rel="stylesheet" href="css/main.css" type="text/css" />
+		<script src="https://unpkg.com/vue/dist/vue.js"></script>
+	</head>
+
+	<body>
+		<div id = "screens">
+			<transition name = "fade" mode = "out-in" appear>
+				<hero v-if = "screen == 'upload'" key = "upload">
+					<h1 class = "title">Drag in a folder with pictures in it.</h1>
+					<a class = "button is-dark is-outlined" onclick = "screens.screen = 'catalog';">
+						<span class = "icon">
+							<i class = "fa fa-folder-open"></i>
+						</span>
+						<span>Or, choose a folder</span>
+					</a>
+					<h5 class = "content upload">Supported images: {{ supportedTypes }}</h5>
+				</hero>
+				<hero v-if = "screen == 'catalog'" key = "catalog">
+					<progress class = "progress is-primary is-large catalog" value = "0" max = "100"></progress>
+					<p class = "content">Scanning files...</p>
+					<a class="button is-danger is-outlined" onclick = "screens.screen = 'main';">
+						<span class="icon">
+							<i class="fa fa-ban"></i>
+						</span>
+						<span>Cancel</span>
+					</a>
+				</hero>
+				<div v-if = "screen == 'main'" key = "main">
+					<div class="columns" style = "height: 100vh;">
+						<div class="column" style = "overflow-y: scroll; padding: 25px; background: white;">
+							<image-item src = "https://placeholdit.imgix.net/~text?txtsize=33&txt=350%C3%97150&w=350&h=150" title = "ay" subtitle = "be" dimensions = "ay"></image-item>
+							<image-item src = "https://placeholdit.imgix.net/~text?txtsize=33&txt=350%C3%97150&w=350&h=150" title = "ay" subtitle = "be" dimensions = "ay"></image-item><image-item src = "https://placeholdit.imgix.net/~text?txtsize=33&txt=350%C3%97150&w=350&h=150" title = "ay" subtitle = "be" dimensions = "ay"></image-item>
+							<image-item src = "https://placeholdit.imgix.net/~text?txtsize=33&txt=350%C3%97150&w=350&h=150" title = "ay" subtitle = "be" dimensions = "ay"></image-item><image-item src = "https://placeholdit.imgix.net/~text?txtsize=33&txt=350%C3%97150&w=350&h=150" title = "ay" subtitle = "be" dimensions = "ay"></image-item><image-item src = "https://placeholdit.imgix.net/~text?txtsize=33&txt=350%C3%97150&w=350&h=150" title = "ay" subtitle = "be" dimensions = "ay"></image-item>
+							<image-item src = "https://placeholdit.imgix.net/~text?txtsize=33&txt=350%C3%97150&w=350&h=150" title = "ay" subtitle = "be" dimensions = "ay"></image-item>
+
+						</div>
+						<div class="column is-three-quarters" style = "background: red; height: 101vh;">
+						bcos
+						</div>
+					</div>
+				</div>
+			</transition>
+		</div>
+		<script src="js/main.js"></script>
+	</body>
+
+</html>

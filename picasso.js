@@ -8,11 +8,11 @@ let load = (page) => window.loadURL(`file:///${__dirname}/${page}.html`);
 /* Startup */
 function start() {
 	window = new BrowserWindow({
-		minWidth: 640,
-		minHeight: 480,
+		minWidth: 320,
+		minHeight: 240,
 		backgroundColor: "#f5f5f5"
 	});
-	load("start");
+	load("main");
 	window.on("close", () => {
 		window = null;
 	});

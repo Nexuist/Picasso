@@ -9,7 +9,6 @@ let makeSelection = (folderPath) => {
 };
 
 window.onload = () => {
-	$(document).ready(() => alert("wassup"));
 };
 // window.onload = () => {
 //

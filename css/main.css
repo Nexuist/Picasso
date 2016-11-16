@@ -15,11 +15,37 @@
 	z-index: 0;
 }
 
-progress.catalog {
+#scan-screen .progress {
 	width: 80%;
 	margin-left: 10%;
 }
 
-h5.upload {
+#upload-screen h5 {
 	margin-top: 20px;
+}
+
+#main-screen {
+	height: 99vh;
+}
+
+#main-screen #sidebar {
+	background: white;
+	padding: 25px;
+	overflow-y: auto;
+}
+
+#main-screen #content {
+	overflow: auto;
+	position: relative;
+}
+
+#main-screen #content img {
+	/* Center image */
+	position: absolute;
+	top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+	overflow: scroll;
+	max-width: none !important;
+	max-height: none !important;
 }

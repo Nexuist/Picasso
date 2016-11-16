@@ -56,7 +56,7 @@ Vue.component("main-screen", {
 	template: `
 	<div class="columns is-mobile" id = "main-screen">
 		<div id = "sidebar">
-			<list-item v-for = "n in 10" src = "https://placehold.it/32x32" :title = "'Image ' + n" subtitle = "Test" dimensions = "64x64"></list-item>
+			<sidebar-row v-for = "n in 10" src = "https://placehold.it/32x32" :title = "'Image ' + n" subtitle = "Test" dimensions = "64x64" :id = "n"></sidebar-row>
 		</div>
 		<div class="column" id = "content">
 			<img src = "https://placehold.it/600x600" />
@@ -64,10 +64,16 @@ Vue.component("main-screen", {
 	</div>`
 });
 
-Vue.component("list-item", {
-	props: ["src", "title", "dimensions", "subtitle"],
+Vue.component("sidebar-row", {
+	props: ["src", "title", "dimensions", "subtitle", "id"],
+	methods: {
+		select: function(id) {
+			let el = document.getElementById(id);
+			el.classList.add("selected");
+		}
+	},
 	template: `
-	<article class="media">
+	<article class="media" v-on:click = "select(id)" :id = "id">
 		<figure class="media-left">
 			<p class="image is-64x64">
 				<img :src="src">

@@ -5,16 +5,6 @@
   opacity: 0
 }
 
-.test-overlay {
-	position: absolute;
-	top: -100%;
-	left: -100%;
-	background: red;
-	width: 250%;
-	height: 215%;
-	z-index: 0;
-}
-
 #scan-screen .progress {
 	width: 80%;
 	margin-left: 10%;
@@ -34,8 +24,23 @@
 	overflow-y: auto;
 }
 
+#main-screen #sidebar article {
+	position: relative;
+	z-index: 1;
+}
+
 #main-screen #sidebar .selected {
-	background-color: red;
+	color: white;
+}
+
+#main-screen #sidebar .selection-overlay {
+	position: absolute;
+	background: #3273dc;
+	top: -0;
+	left: -15px;
+	width: 122%;
+	height: 115%;
+	z-index: -1;
 }
 
 #main-screen #content {

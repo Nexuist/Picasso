@@ -66,23 +66,23 @@ Vue.component("main-screen", {
 
 Vue.component("sidebar-row", {
 	props: ["src", "title", "dimensions", "subtitle", "id"],
-	methods: {
-		select: function(id) {
-			let el = document.getElementById(id);
-			el.classList.add("selected");
-		}
+	data: () => {
+		return {
+			selected: false
+		};
 	},
 	template: `
-	<article class="media" v-on:click = "select(id)" :id = "id">
+	<article class="media" v-on:click = "selected = !selected" :id = "id">
+		<div v-if = "selected" class = "selection-overlay"></div>
 		<figure class="media-left">
 			<p class="image is-64x64">
 				<img :src="src">
 			</p>
 		</figure>
 		<div class="media-content">
-			<div class="content">
+			<div class="content" :class = "{selected: selected}">
 				<p>
-					<strong>{{ title }}</strong>
+					<strong :class = "{selected: selected}">{{ title }}</strong>
 					<small>{{ dimensions }}</small>
 					<br>
 					{{ subtitle }}

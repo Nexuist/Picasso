@@ -21,6 +21,7 @@
 #main-screen #sidebar {
 	background: white;
 	padding: 25px;
+	padding-top: 0;
 	overflow-y: auto;
 }
 
@@ -31,6 +32,11 @@
 
 #main-screen #sidebar .selected {
 	color: white;
+}
+
+#main-screen #sidebar .media {
+	margin-top: 10px;
+	padding-top: 10px;
 }
 
 #main-screen #sidebar .selection-overlay {

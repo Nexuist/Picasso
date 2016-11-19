@@ -52,11 +52,19 @@ Vue.component("scan-screen", {
 	</hero>`
 });
 
+let bus = new Vue();
+
 Vue.component("main-screen", {
+	methods: {
+		select: function(n) {
+			bus.$emit("select", n);
+			bus.$emit("test");
+		}
+	},
 	template: `
 	<div class="columns is-mobile" id = "main-screen">
 		<div id = "sidebar">
-			<sidebar-row v-for = "n in 10" src = "https://placehold.it/32x32" :title = "'Image ' + n" subtitle = "Test" dimensions = "64x64" :id = "n"></sidebar-row>
+			<sidebar-row v-on:click.native = "select(n)" v-for = "n in 10" src = "https://placehold.it/32x32" :title = "'Image ' + n" subtitle = "Test" dimensions = "64x64" :id = "n"></sidebar-row>
 		</div>
 		<div class="column" id = "content">
 			<img src = "https://placehold.it/600x600" />
@@ -66,13 +74,19 @@ Vue.component("main-screen", {
 
 Vue.component("sidebar-row", {
 	props: ["src", "title", "dimensions", "subtitle", "id"],
+	created: function() {
+		let vm = this;
+		bus.$on("select", function(n) {
+			vm.selected = (n == vm.id) ? true : false;
+		});
+	},
 	data: () => {
 		return {
 			selected: false
 		};
 	},
 	template: `
-	<article class="media" v-on:click = "selected = !selected" :id = "id">
+	<article class="media">
 		<div v-if = "selected" class = "selection-overlay"></div>
 		<figure class="media-left">
 			<p class="image is-64x64">
@@ -96,6 +110,6 @@ Vue.component("sidebar-row", {
 let screens = new Vue({
 	el: "#screens",
 	data: {
-		screen: "main-screen"
+		screen: "main-screen",
 	}
 });

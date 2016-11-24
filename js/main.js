@@ -1,9 +1,6 @@
-window.$ = require("./js/jquery-3.1.1.min.js");
 const {webFrame} = require("electron");
-webFrame.setZoomLevelLimits(1, 1);
 
-const supportedTypes = ["png", "jpg"];
-
+webFrame.setZoomLevelLimits(1, 1); // Disable zooming for the entire window
 
 Vue.component("hero", {
 	template: `
@@ -21,35 +18,19 @@ Vue.component("hero", {
 Vue.component("upload-screen", {
 	data: () => {
 		return {
-			supportedTypes: ["png", "jpg"]
+			types: ["png", "jpg"]
 		};
 	},
-	template: `
-	<hero id = "upload-screen">
-		<h1 class = "title">Drag in a folder with pictures in it.</h1>
-		<a class = "button is-dark is-outlined" onclick = "screens.screen = 'scan-screen';">
-			<span class = "icon">
-				<i class = "fa fa-folder-open"></i>
-			</span>
-			<span>Or, choose a folder</span>
-		</a>
-		<h5 class = "content upload">Supported images: {{ supportedTypes.join(", ").toUpperCase() }}</h5>
-	</hero>
-	`
+	computed: {
+		supportedTypes: function() {
+			return this.types.join(", ").toUpperCase();
+		}
+	},
+	template: `#upload-template`
 });
 
 Vue.component("scan-screen", {
-	template: `
-	<hero id = "scan-screen">
-		<progress class = "progress is-primary is-large catalog" value = "0" max = "100"></progress>
-		<p class = "content">Scanning files...</p>
-		<a class="button is-danger is-outlined" onclick = "screens.screen = 'main-screen';">
-			<span class="icon">
-				<i class="fa fa-ban"></i>
-			</span>
-			<span>Cancel</span>
-		</a>
-	</hero>`
+	template: `#scan-template`
 });
 
 let bus = new Vue();
@@ -61,15 +42,7 @@ Vue.component("main-screen", {
 			bus.$emit("test");
 		}
 	},
-	template: `
-	<div class="columns is-mobile" id = "main-screen">
-		<div id = "sidebar">
-			<sidebar-row v-on:click.native = "select(n)" v-for = "n in 10" src = "https://placehold.it/32x32" :title = "'Image ' + n" subtitle = "Test" dimensions = "64x64" :id = "n"></sidebar-row>
-		</div>
-		<div class="column" id = "content">
-			<img src = "https://placehold.it/600x600" />
-		</div>
-	</div>`
+	template: `#main-template`
 });
 
 Vue.component("sidebar-row", {
@@ -110,6 +83,6 @@ Vue.component("sidebar-row", {
 let screens = new Vue({
 	el: "#screens",
 	data: {
-		screen: "main-screen",
+		screen: "upload-screen",
 	}
 });

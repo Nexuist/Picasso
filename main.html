@@ -9,6 +9,40 @@
 	</head>
 
 	<body>
+		<template id = "upload-template">
+			<hero id = "upload">
+				<h1 class = "title">Drag in a folder with pictures in it.</h1>
+				<a class = "button is-dark is-outlined" onclick = "screens.screen = 'scan-screen';">
+					<span class = "icon">
+						<i class = "fa fa-folder-open"></i>
+					</span>
+					<span>Or, choose a folder</span>
+				</a>
+				<h5 class = "content upload">Supported images: {{ supportedTypes }}</h5>
+			</hero>
+		</template>
+		<template id = "scan-template">
+			<hero id = "scan">
+				<progress class = "progress is-primary is-large catalog" value = "0" max = "100"></progress>
+				<p class = "content">Scanning files...</p>
+				<a class="button is-danger is-outlined" onclick = "screens.screen = 'main-screen';">
+					<span class="icon">
+						<i class="fa fa-ban"></i>
+					</span>
+					<span>Cancel</span>
+				</a>
+			</hero>
+		</template>
+		<template id = "main-template">
+			<div id = "main" class="columns is-mobile">
+				<div id = "sidebar">
+					<sidebar-row v-on:click.native = "select(n)" v-for = "n in 10" src = "https://placehold.it/32x32" :title = "'Image ' + n" subtitle = "Test" dimensions = "64x64" :id = "n"></sidebar-row>
+				</div>
+				<div class="column" id = "content">
+					<img src = "https://placehold.it/600x600" />
+				</div>
+			</div>
+		</template>
 		<div id = "screens">
 			<transition name = "fade" mode = "out-in" appear>
 				<component :is = "screen"></component>

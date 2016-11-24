@@ -1,5 +1,5 @@
 .fade-enter-active, .fade-leave-active {
-  transition: opacity .2s
+  transition: opacity .4s
 }
 .fade-enter, .fade-leave-active {
   opacity: 0
@@ -21,6 +21,7 @@
 #main-screen #sidebar {
 	background: white;
 	padding: 25px;
+	padding-bottom: 0;
 	padding-top: 0;
 	overflow-y: auto;
 }

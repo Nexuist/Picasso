@@ -10,20 +10,20 @@
 		<template id = "upload-template">
 			<hero id = "upload">
 				<h1 class = "title">Drag in a folder with pictures in it.</h1>
-				<a class = "button is-dark is-outlined" onclick = "screens.screen = 'scan-screen';">
+				<a v-on:click = "manualUpload" class = "button is-dark is-outlined">
 					<span class = "icon">
 						<i class = "fa fa-folder-open"></i>
 					</span>
 					<span>Or, choose a folder</span>
 				</a>
-				<h5 class = "content upload">Supported images: {{ supportedTypes }}</h5>
+				<h5 class = "content upload">{{ label }}</h5>
 			</hero>
 		</template>
 		<template id = "scan-template">
 			<hero id = "scan">
 				<progress class = "progress is-primary is-large catalog" value = "0" max = "100"></progress>
 				<p class = "content">Scanning files...</p>
-				<a class="button is-danger is-outlined" onclick = "screens.screen = 'main-screen';">
+				<a class="button is-danger is-outlined" onclick = "screens.screen = 'UploadViewController';">
 					<span class="icon">
 						<i class="fa fa-ban"></i>
 					</span>

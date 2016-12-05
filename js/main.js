@@ -1,6 +1,10 @@
-const {webFrame} = require("electron");
+const {remote, webFrame} = require("electron");
+const dialog = remote.dialog;
+const browserWindow = remote.getCurrentWindow();
 
 webFrame.setZoomLevelLimits(1, 1); // Disable zooming for the entire window
+
+let bus = new Vue();
 
 Vue.component("hero", {
 	template: `
@@ -15,27 +19,58 @@ Vue.component("hero", {
 	`
 });
 
-Vue.component("upload-screen", {
+Vue.component("UploadViewController", {
 	data: () => {
 		return {
-			types: ["png", "jpg"]
+			label: "Supported Types: " + ["png", "jpg"].join(", ").toUpperCase()
 		};
 	},
-	computed: {
-		supportedTypes: function() {
-			return this.types.join(", ").toUpperCase();
+	created: function() {
+		var vm = this;
+		document.addEventListener("dragover", event => {
+			event.preventDefault();
+		});
+		document.addEventListener("drop", event => {
+			event.preventDefault();
+			if (!event.dataTransfer.files || !event.dataTransfer.items) return;
+			var file = event.dataTransfer.files[0]; // dataTransfer.files contains full path
+			var item = event.dataTransfer.items[0].webkitGetAsEntry(); // dataTransfer.items[0].webkitGetAsEntry() allows us to find out if the uploaded file is a folder
+			if (!item) return;
+			if (item.isDirectory) {
+				vm.finalize(file.path);
+			}
+			else {
+				vm.label = "Sorry, you can only choose a folder.";
+			}
+		});
+	},
+	methods: {
+		manualUpload: () => {
+			console.log(this.$data);
+			dialog.showOpenDialog(browserWindow, {
+				properties: ["openDirectory"]
+			}, selectedFolders => {
+				if (selectedFolders) finalize(selectedFolders[0]);
+			});
+		},
+		finalize: (path) => {
+			bus.$emit("changeView", "ScanViewController");
+			bus.$emit("setFolderPath", path);
 		}
 	},
-	template: `#upload-template`
+	template: "#upload-template"
 });
 
-Vue.component("scan-screen", {
-	template: `#scan-template`
+Vue.component("ScanViewController", {
+	template: "#scan-template",
+	created: function() {
+		console.log('created');
+		bus.$on("setFolderPath", (path) => console.log("hey!"));
+	}
 });
 
-let bus = new Vue();
 
-Vue.component("main-screen", {
+Vue.component("MainViewController", {
 	methods: {
 		select: function(n) {
 			bus.$emit("select", n);
@@ -83,6 +118,11 @@ Vue.component("sidebar-row", {
 let screens = new Vue({
 	el: "#screens",
 	data: {
-		screen: "upload-screen",
+		screen: "UploadViewController"
+	},
+	created: function() {
+		bus.$on("changeView", (view) => {
+			screens.screen = view;
+		});
 	}
 });

@@ -1,15 +1,15 @@
-const {remote, webFrame} = require("electron");
-const dialog = remote.dialog;
-const browserWindow = remote.getCurrentWindow();
+const {remote, webFrame, ipcRenderer} = require("electron");
+let fs = remote.require("fs");
 
 webFrame.setZoomLevelLimits(1, 1); // Disable zooming for the entire window
 
+let supportedTypes = ["png", "jpg"];
 let bus = new Vue();
 
 Vue.component("UploadViewController", {
 	data: () => {
 		return {
-			label: "Supported Types: " + ["png", "jpg"].join(", ").toUpperCase()
+			label: "Supported Types: " + supportedTypes.join(", ").toUpperCase()
 		};
 	},
 	created: function() {
@@ -33,7 +33,7 @@ Vue.component("UploadViewController", {
 		},
 		manualUpload: function() {
 			let vm = this;
-			dialog.showOpenDialog(browserWindow, {
+			remote.dialog.showOpenDialog(remote.getCurrentWindow(), {
 				properties: ["openDirectory"]
 			}, selectedFolders => {
 				if (selectedFolders) vm.finalize(selectedFolders[0]);
@@ -51,7 +51,8 @@ Vue.component("ScanViewController", {
 	template: "#ScanView",
 	created: function() {
 		let path = bus.folderPath;
-		console.log(path);
+		ipcRenderer.on("async", (event, hm) => console.log(hm));
+		ipcRenderer.send("beginScan", bus.folderPath);
 	}
 });
 

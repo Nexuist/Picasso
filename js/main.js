@@ -6,19 +6,6 @@ webFrame.setZoomLevelLimits(1, 1); // Disable zooming for the entire window
 
 let bus = new Vue();
 
-Vue.component("hero", {
-	template: `
-	<section class = "hero is-fullheight is-light">
-		<div class = "hero-body">
-			<div class = "container has-text-centered">
-				<slot>
-				</slot>
-			</div>
-		</div>
-	</section>
-	`
-});
-
 Vue.component("UploadViewController", {
 	data: () => {
 		return {
@@ -26,18 +13,17 @@ Vue.component("UploadViewController", {
 		};
 	},
 	created: function() {
-		var vm = this;
-		document.addEventListener("dragover", event => {
-			event.preventDefault();
-		});
+		let vm = this;
+		document.addEventListener("dragover", event => event.preventDefault());
 		document.addEventListener("drop", event => {
 			event.preventDefault();
 			if (!event.dataTransfer.files || !event.dataTransfer.items) return;
-			var file = event.dataTransfer.files[0]; // dataTransfer.files contains full path
-			var item = event.dataTransfer.items[0].webkitGetAsEntry(); // dataTransfer.items[0].webkitGetAsEntry() allows us to find out if the uploaded file is a folder
-			if (!item) return;
+			let file = event.dataTransfer.files[0]; // Contains full path
+			let item = event.dataTransfer.items[0].webkitGetAsEntry(); // Allows us to find out if the uploaded file is a folder
+			if (!file || !item) return;
 			if (item.isDirectory) {
-				vm.finalize(file.path);
+				bus.folderPath = file.path;
+				bus.$emit("changeView", "ScanViewController");
 			}
 			else {
 				vm.label = "Sorry, you can only choose a folder.";
@@ -46,23 +32,21 @@ Vue.component("UploadViewController", {
 	},
 	methods: {
 		manualUpload: () => {
-			console.log(this.$data);
 			dialog.showOpenDialog(browserWindow, {
 				properties: ["openDirectory"]
 			}, selectedFolders => {
-				if (selectedFolders) finalize(selectedFolders[0]);
+				if (selectedFolders) {
+					bus.folderPath = selectedFolders[0];
+					bus.$emit("changeView", "ScanViewController");
+				}
 			});
-		},
-		finalize: (path) => {
-			bus.$emit("changeView", "ScanViewController");
-			bus.$emit("setFolderPath", path);
 		}
 	},
-	template: "#upload-template"
+	template: "#UploadView"
 });
 
 Vue.component("ScanViewController", {
-	template: "#scan-template",
+	template: "#ScanView",
 	created: function() {
 		console.log('created');
 		bus.$on("setFolderPath", (path) => console.log("hey!"));
@@ -121,8 +105,6 @@ let screens = new Vue({
 		screen: "UploadViewController"
 	},
 	created: function() {
-		bus.$on("changeView", (view) => {
-			screens.screen = view;
-		});
+		bus.$on("changeView", (view) => screens.screen = view);
 	}
 });

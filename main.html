@@ -7,32 +7,40 @@
 		<script src="https://unpkg.com/vue@2.0.0/dist/vue.js"></script>
 	</head>
 	<body>
-		<template id = "upload-template">
-			<hero id = "upload">
-				<h1 class = "title">Drag in a folder with pictures in it.</h1>
-				<a v-on:click = "manualUpload" class = "button is-dark is-outlined">
-					<span class = "icon">
-						<i class = "fa fa-folder-open"></i>
-					</span>
-					<span>Or, choose a folder</span>
-				</a>
-				<h5 class = "content upload">{{ label }}</h5>
-			</hero>
+		<template id = "UploadView">
+			<section class = "hero is-fullheight is-light" id = "UploadView">
+				<div class = "hero-body">
+					<div class = "container has-text-centered">
+						<h1 class = "title">Drag in a folder containing images.</h1>
+						<a v-on:click = "manualUpload" class = "button is-dark is-outlined">
+							<span class = "icon">
+								<i class = "fa fa-folder-open"></i>
+							</span>
+							<span>Or, choose a folder</span>
+						</a>
+						<h5>{{label}}</h5>
+					</div>
+				</div>
+			</section>
 		</template>
-		<template id = "scan-template">
-			<hero id = "scan">
-				<progress class = "progress is-primary is-large catalog" value = "0" max = "100"></progress>
-				<p class = "content">Scanning files...</p>
-				<a class="button is-danger is-outlined" onclick = "screens.screen = 'UploadViewController';">
-					<span class="icon">
-						<i class="fa fa-ban"></i>
-					</span>
-					<span>Cancel</span>
-				</a>
-			</hero>
+		<template id = "ScanView">
+			<section class = "hero is-fullheight is-light" id = "ScanView">
+				<div class = "hero-body">
+					<div class = "container has-text-centered">
+						<progress class = "progress is-primary is-large" value = "0" max = "100"></progress>
+						<p class = "content">Scanning files...</p>
+						<a class="button is-danger is-outlined" onclick = "screens.screen = 'UploadViewController';">
+							<span class="icon">
+								<i class="fa fa-ban"></i>
+							</span>
+							<span>Cancel</span>
+						</a>
+					</div>
+				</div>
+			</section>
 		</template>
-		<template id = "main-template">
-			<div id = "main" class="columns is-mobile">
+		<template id = "MainView">
+			<div id = "MainView" class="columns is-mobile">
 				<div id = "sidebar">
 					<sidebar-row v-on:click.native = "select(n)" v-for = "n in 10" src = "https://placehold.it/32x32" :title = "'Image ' + n" subtitle = "Test" dimensions = "64x64" :id = "n"></sidebar-row>
 				</div>

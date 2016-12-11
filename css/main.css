@@ -7,42 +7,42 @@
 }
 
 /* Upload screen */
-#upload h5 {
+#UploadView h5 {
 	margin-top: 20px;
 }
 
 /* Scan screen */
-#scan .progress {
+#ScanView .progress {
 	width: 80%;
 	margin-left: 10%;
 }
 
 /* Main screen */
-#main #sidebar {
+#MainView #sidebar {
 	background: white;
 	padding: 0 25px;
 	overflow-y: auto;
 }
 
-#main {
+#MainView {
 	height: 100vh;
 }
 
-#main #sidebar article {
+#MainView #sidebar article {
 	position: relative;
 	z-index: 1;
 }
 
-#main #sidebar .selected {
+#MainView #sidebar .selected {
 	color: white;
 }
 
-#main #sidebar .media {
+#MainView #sidebar .media {
 	margin-top: 10px;
 	padding-top: 10px;
 }
 
-#main #sidebar .selection-overlay {
+#MainView #sidebar .selection-overlay {
 	position: absolute;
 	background: #3273dc;
 	top: -0;
@@ -52,12 +52,12 @@
 	z-index: -1;
 }
 
-#main #content {
+#MainView #content {
 	overflow: auto;
 	position: relative;
 }
 
-#main #content img {
+#MainView #content img {
 	position: absolute;
 	top: 50%;
   left: 50%;

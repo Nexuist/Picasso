@@ -13,33 +13,35 @@ Vue.component("UploadViewController", {
 		};
 	},
 	created: function() {
-		let vm = this;
 		document.addEventListener("dragover", event => event.preventDefault());
-		document.addEventListener("drop", event => {
+		document.addEventListener("drop", this.onDrop);
+	},
+	methods: {
+		onDrop: function() {
+			let vm = this;
 			event.preventDefault();
 			if (!event.dataTransfer.files || !event.dataTransfer.items) return;
 			let file = event.dataTransfer.files[0]; // Contains full path
 			let item = event.dataTransfer.items[0].webkitGetAsEntry(); // Allows us to find out if the uploaded file is a folder
 			if (!file || !item) return;
 			if (item.isDirectory) {
-				bus.folderPath = file.path;
-				bus.$emit("changeView", "ScanViewController");
+				vm.finalize(file.path);
 			}
 			else {
 				vm.label = "Sorry, you can only choose a folder.";
 			}
-		});
-	},
-	methods: {
-		manualUpload: () => {
+		},
+		manualUpload: function() {
+			let vm = this;
 			dialog.showOpenDialog(browserWindow, {
 				properties: ["openDirectory"]
 			}, selectedFolders => {
-				if (selectedFolders) {
-					bus.folderPath = selectedFolders[0];
-					bus.$emit("changeView", "ScanViewController");
-				}
+				if (selectedFolders) vm.finalize(selectedFolders[0]);
 			});
+		},
+		finalize: (path) => {
+			bus.folderPath = path;
+			bus.$emit("changeView", "ScanViewController");
 		}
 	},
 	template: "#UploadView"
@@ -48,8 +50,8 @@ Vue.component("UploadViewController", {
 Vue.component("ScanViewController", {
 	template: "#ScanView",
 	created: function() {
-		console.log('created');
-		bus.$on("setFolderPath", (path) => console.log("hey!"));
+		let path = bus.folderPath;
+		console.log(path);
 	}
 });
 

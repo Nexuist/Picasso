@@ -1,55 +1,101 @@
 "use strict";
 let fs = require("fs");
-let path = require("path");
+let pathUtil = require("path");
 let sizeOf = require("image-size");
-let folderPath = "/Users/Andi/Desktop/Test";
+let folderPath = "/Users/Andi/Applications/";
 let supportedTypes = ["png", "jpg"];
 
-
-
-function scan(folder, errorCallback, progressCallback, successCallback) {
-	let media = [];
-	fs.readdir(folder, (err, files) => {
-		if (err) {
-			errorCallback(err, "Unable to read folder: " + folder);
-			return;
-		}
-		let total = files.length;
-		files.forEach((file, index) => {
-			progressCallback(index + 1, total);
-			file = file.toLowerCase();
-			let extension = path.extname(file).substring(1);
-			if (supportedTypes.indexOf(extension) <= -1) return;
-			let filePath = path.join(folderPath, file);
-			fs.stat(filePath, (err, stat) => {
-				if (err) {
-					errorCallback(err, "Unable to get information on file: " + file);
-					return;
-				}
-				if (stat.isDirectory()) return;
-				let width = "?", height = "?";
-				sizeOf(filePath, (err, dimensions) => {
-					if (err) {
-						errorCallback(err, "Couldn't get dimensions for file: " + file);
-					}
-					else {
-						width = dimensions.width;
-						height = dimensions.height;
-					}
-					media.push({
-						path: file,
-						width: width,
-						height: height,
-						size: stat.size / 1000000.0 // Convert into MB
-					});
-					if (index == total - 1) successCallback(media);
-				});
-			});
-		});
-	});
+function scanFile(path, completeCallback) {
+  fs.stat(path, (err, stat) => {
+    if (err) {
+      completeCallback({
+        type: "error",
+        error: err
+      });
+      return;
+    }
+    if (stat.isDirectory()) {
+      completeCallback({
+        type: "folder",
+        path: path
+      });
+      return;
+    }
+    let ext = pathUtil.extname(path).substring(1);
+    if (supportedTypes.indexOf(ext) <= -1) {
+      completeCallback({
+        type: "unsupported",
+        path: path
+      }); 
+      return;
+    }
+    let width = "?", height = "?";
+    sizeOf(path, (err, dimensions) => {
+      if (err) {
+        completeCallback({
+          type: "error",
+          error: err
+        });
+        return;
+      }
+      width = dimensions.width;
+      height = dimensions.height;
+      completeCallback({
+        type: "media",
+        path: path,
+        height: height,
+        width: width,
+        size: stat.size / 100000 // Convert into mB
+      });
+    });
+  });
 }
 
-
-scan(folderPath, (err, msg) => console.log("Encountered error:", msg),
-	(i, total) => console.log("Scanning file", i, "of", total),
-	(media) => console.log("End result:", media));
+module.exports.launch = function launch(startPath, recursively, progressCallback, successCallback) {
+  let media = [];
+  let progress = {
+    leftToProcess: 0,
+    errors: 0,
+    unsupported: 0,
+    scans: 0
+  };
+  function subScan(path) {
+    progress.scans++;
+    fs.readdir(path, (err, files) => {
+      if (err) {
+        console.log("Error reading folder", err);
+        progress.scans--;
+        return;
+      }
+      let i = 0;
+      let total = files.length;
+      progress.leftToProcess += total;
+      files.forEach((file, index) => {
+        let filePath = pathUtil.join(path, file);
+        scanFile(filePath, (completed) => {
+          switch(completed.type) {
+            case "media":
+              media.push(completed);
+              break;
+            case "unsupported":
+              progress.unsupported++;
+              break;
+            case "error":
+              progress.errors++;
+              console.log("Couldn't read", filePath, "due to error", completed.error);
+              break;
+            case "folder":
+              if (recursively) subScan(completed.path);
+              break;
+          }
+          i++;
+          progress.leftToProcess--;
+          progressCallback(progress);
+          if (i >= total) progress.scans--; // When a directory is fully walked, all files will have been processed until another directory is encountered
+          if (progress.scans == 0) successCallback(media); // All done now
+        });
+      });
+    });
+  }
+  subScan(startPath);
+}

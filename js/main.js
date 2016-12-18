@@ -1,5 +1,5 @@
 const {remote, webFrame, ipcRenderer} = require("electron");
-let fs = remote.require("fs");
+let scanner = remote.require("./scan");
 
 webFrame.setZoomLevelLimits(1, 1); // Disable zooming for the entire window
 
@@ -15,6 +15,7 @@ Vue.component("UploadViewController", {
 	created: function() {
 		document.addEventListener("dragover", event => event.preventDefault());
 		document.addEventListener("drop", this.onDrop);
+		console.log(scanner);
 	},
 	methods: {
 		onDrop: function() {
@@ -51,8 +52,7 @@ Vue.component("ScanViewController", {
 	template: "#ScanView",
 	created: function() {
 		let path = bus.folderPath;
-		ipcRenderer.on("async", (event, hm) => console.log(hm));
-		ipcRenderer.send("beginScan", bus.folderPath);
+		scanner.launch(path, true, (progress) => console.log(progress), (media) => console.log(media));
 	}
 });
 
@@ -82,22 +82,22 @@ Vue.component("sidebar-row", {
 	},
 	template: `
 	<article class="media">
-		<div v-if = "selected" class = "selection-overlay"></div>
-		<figure class="media-left">
-			<p class="image is-64x64">
-				<img :src="src">
-			</p>
-		</figure>
-		<div class="media-content">
-			<div class="content" :class = "{selected: selected}">
-				<p>
-					<strong :class = "{selected: selected}">{{ title }}</strong>
-					<small>{{ dimensions }}</small>
-					<br>
-					{{ subtitle }}
-				</p>
-			</div>
-		</div>
+	<div v-if = "selected" class = "selection-overlay"></div>
+	<figure class="media-left">
+	<p class="image is-64x64">
+	<img :src="src">
+	</p>
+	</figure>
+	<div class="media-content">
+	<div class="content" :class = "{selected: selected}">
+	<p>
+	<strong :class = "{selected: selected}">{{ title }}</strong>
+	<small>{{ dimensions }}</small>
+	<br>
+	{{ subtitle }}
+	</p>
+	</div>
+	</div>
 	</article>
 	`
 });

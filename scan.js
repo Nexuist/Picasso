@@ -54,7 +54,8 @@ function scanFile(path, completeCallback) {
 module.exports.launch = function launch(startPath, recursively, progressCallback, successCallback) {
   let media = [];
   let progress = {
-    leftToProcess: 0,
+    processed: 0,
+    total: 0,
     errors: 0,
     unsupported: 0,
     scans: 0
@@ -69,7 +70,7 @@ module.exports.launch = function launch(startPath, recursively, progressCallback
       }
       let i = 0;
       let total = files.length;
-      progress.leftToProcess += total;
+      progress.total += total;
       files.forEach((file, index) => {
         let filePath = pathUtil.join(path, file);
         scanFile(filePath, (completed) => {
@@ -89,7 +90,7 @@ module.exports.launch = function launch(startPath, recursively, progressCallback
               break;
           }
           i++;
-          progress.leftToProcess--;
+          progress.processed++;
           progressCallback(progress);
           if (i >= total) progress.scans--; // When a directory is fully walked, all files will have been processed until another directory is encountered
           if (progress.scans == 0) successCallback(media); // All done now

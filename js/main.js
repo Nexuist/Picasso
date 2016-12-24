@@ -2,11 +2,13 @@ const {remote, webFrame, ipcRenderer} = require("electron");
 let scanner = remote.require("./scan");
 
 webFrame.setZoomLevelLimits(1, 1); // Disable zooming for the entire window
+remote.getCurrentWindow().toggleDevTools(); // DEBUG
 
 let supportedTypes = ["png", "jpg"];
 let bus = new Vue();
 
 Vue.component("UploadViewController", {
+	template: "#UploadView",
 	data: () => {
 		return {
 			label: "Supported Types: " + supportedTypes.join(", ").toUpperCase()
@@ -15,7 +17,6 @@ Vue.component("UploadViewController", {
 	created: function() {
 		document.addEventListener("dragover", event => event.preventDefault());
 		document.addEventListener("drop", this.onDrop);
-		console.log(scanner);
 	},
 	methods: {
 		onDrop: function() {
@@ -45,14 +46,28 @@ Vue.component("UploadViewController", {
 			bus.$emit("changeView", "ScanViewController");
 		}
 	},
-	template: "#UploadView"
 });
 
 Vue.component("ScanViewController", {
 	template: "#ScanView",
+	data: () => {
+		return {
+			progress: {
+				processed: 0,
+				total: 0,
+				unsupported: 0,
+				errors: 0
+			}
+		}
+	},
 	created: function() {
 		let path = bus.folderPath;
-		scanner.launch(path, true, (progress) => console.log(progress), (media) => console.log(media));
+		let vm = this;
+		scanner.launch(path, true, (progress) => {
+			vm.progress = progress;
+			vm.$forceUpdate();
+			console.log(progress.processed);
+		}, () => {});
 	}
 });
 

@@ -27,8 +27,9 @@
 			<section class = "hero is-fullheight is-light" id = "ScanView">
 				<div class = "hero-body">
 					<div class = "container has-text-centered">
-						<progress class = "progress is-primary is-large" value = "0" max = "100"></progress>
-						<p class = "content">Scanning files...</p>
+						<progress class = "progress is-primary is-large" :value = "progress.processed" :max = "progress.total"></progress>
+						<p class = "content">Scanning file {{progress.processed}} of {{progress.total}}...</p>
+						<p class = "content">Found {{progress.unsupported}} unsupported file(s) and encountered {{progress.errors}} error(s)</p>
 						<a class="button is-danger is-outlined" onclick = "screens.screen = 'UploadViewController';">
 							<span class="icon">
 								<i class="fa fa-ban"></i>

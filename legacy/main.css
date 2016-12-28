@@ -11,6 +11,10 @@
 	margin-top: 20px;
 }
 
+#UploadView .control {
+	text-align: center !important;
+}
+
 /* Scan screen */
 #ScanView .progress {
 	width: 80%;

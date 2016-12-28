@@ -42,6 +42,7 @@ function scanFile(path, completeCallback) {
       height = dimensions.height;
       completeCallback({
         type: "media",
+        name: pathUtil.basename(path),
         path: path,
         height: height,
         width: width,
@@ -52,7 +53,7 @@ function scanFile(path, completeCallback) {
 }
 
 
-module.exports.launch = function launch(startPath, recursively, shouldCancelCallback, progressCallback, successCallback) {
+module.exports.launch = function launch(startPath, recursively, shouldContinueCallback, progressCallback, successCallback) {
   let media = []; // Holds all entries
   let currentScans = 0; // Includes both folder and file scans
   let maxScans = 256; // Needed to avoid the max I/O open limit imposed by operating systems
@@ -73,7 +74,9 @@ module.exports.launch = function launch(startPath, recursively, shouldCancelCall
       }
       else {
         progress.total += fileNames.length;
-        pendingScans = pendingScans.concat(fileNames);
+        fileNames.forEach((fileName) => {
+          pendingScans.push(pathUtil.join(path, fileName));
+        });
       }
       console.log("Finished scanning folder", path);
       currentScans--;
@@ -81,51 +84,53 @@ module.exports.launch = function launch(startPath, recursively, shouldCancelCall
     });
   };
   let scanPending = (waitingPreviously) => {
-    if (shouldCancelCallback() || (currentScans == 0 && pendingScans.length == 0 && initialScanComplete)) {
-      console.log("Finished");
-      successCallback(media);
-      return;
-    }
-    if (pendingScans.length == 0) {
-      // No pending scans, but there are scans in progress - wait for them to finish
-      console.log("Pending");
-      setTimeout(scanPending, 5);
-      return;
-    }
-    if (currentScans < maxScans) {
-      // Max scan limit not yet reached
-      let file = pendingScans.shift(); // Pop the first element of the array
-      scanFile(pathUtil.join(startPath, file), (completed) => {
-        switch(completed.type) {
-          case "media":
-            media.push(completed);
-            break;
-          case "unsupported":
-            progress.unsupported++;
-            break;
-          case "error":
-            progress.errors++;
-            console.log("Couldn't read", file, "due to error", completed.error);
-            break;
-        }
-        currentScans--;
-        progress.processed++;
-        if (recursively && completed.type == "folder") scanFolder(completed.path);
-        progressCallback(progress);
-      });
-      currentScans++;
-    }
-    else {
-      // Max scan limit reached
-      let waitTime = 5;
-      if (waitingPreviously !== undefined) {
-        waitTime = waitingPreviously + (waitingPreviously / 2);
+    shouldContinueCallback((shouldContinue) => {
+      if (!shouldContinue || (currentScans == 0 && pendingScans.length == 0 && initialScanComplete)) {
+        console.log("Finished");
+        if (shouldContinue) successCallback(media);
+        return;
       }
-      console.log("Too many scans; waiting till next time", waitTime);
-      setTimeout(() => scanPending(waitTime), waitTime);
-      return;
-    }
-    setTimeout(scanPending, 5); // Execute recursively
+      if (pendingScans.length == 0) {
+        // No pending scans, but there are scans in progress - wait for them to finish
+        console.log("Pending");
+        setTimeout(scanPending, 5);
+        return;
+      }
+      if (currentScans < maxScans) {
+        // Max scan limit not yet reached
+        let file = pendingScans.shift(); // Pop the first element of the array
+        scanFile(file, (completed) => {
+          switch(completed.type) {
+            case "media":
+              media.push(completed);
+              break;
+            case "unsupported":
+              progress.unsupported++;
+              break;
+            case "error":
+              progress.errors++;
+              console.log("Couldn't read", file, "due to error", completed.error);
+              break;
+          }
+          currentScans--; 
+          progress.processed++;
+          if (recursively && completed.type == "folder") scanFolder(completed.path);
+          progressCallback(progress);
+        });
+        currentScans++;
+      }
+      else {
+        // Max scan limit reached
+        let waitTime = 5;
+        if (waitingPreviously !== undefined) {
+          waitTime = waitingPreviously + (waitingPreviously / 2);
+        }
+        console.log("Too many scans; waiting till next time", waitTime);
+        setTimeout(() => scanPending(waitTime), waitTime);
+        return;
+      }
+      setTimeout(scanPending, 5); // Execute recursively
+    });
   };
   scanFolder(startPath);
   setTimeout(scanPending, 20);

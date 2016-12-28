@@ -1,8 +1,8 @@
 const {remote, webFrame, ipcRenderer} = require("electron");
-let scanner = remote.require("./scan");
+let scanner = remote.require("./js/scan");
 
 webFrame.setZoomLevelLimits(1, 1); // Disable zooming for the entire window
-remote.getCurrentWindow().toggleDevTools(); // DEBUG
+//remote.getCurrentWindow().toggleDevTools(); // DEBUG
 
 let supportedTypes = ["png", "jpg"];
 let bus = new Vue();
@@ -11,7 +11,8 @@ Vue.component("UploadViewController", {
 	template: "#UploadView",
 	data: () => {
 		return {
-			label: "Supported Types: " + supportedTypes.join(", ").toUpperCase()
+			label: "Supported Types: " + supportedTypes.join(", ").toUpperCase(),
+			recursively: true
 		};
 	},
 	created: function() {
@@ -41,8 +42,9 @@ Vue.component("UploadViewController", {
 				if (selectedFolders) vm.finalize(selectedFolders[0]);
 			});
 		},
-		finalize: (path) => {
+		finalize: function(path) {
 			bus.folderPath = path;
+			bus.recursively = this.recursively;
 			bus.$emit("changeView", "ScanViewController");
 		}
 	},
@@ -57,32 +59,49 @@ Vue.component("ScanViewController", {
 				total: 0,
 				unsupported: 0,
 				errors: 0
-			}
+			},
+			shouldContinue: true
 		}
 	},
 	created: function() {
-		let path = bus.folderPath;
 		let vm = this;
-		scanner.launch(path, true, (progress) => {
+		scanner.launch(bus.folderPath, bus.recursively, (callback) => callback(vm.shouldContinue), (progress) => {
 			vm.progress = progress;
 			vm.$forceUpdate();
-			console.log(progress.processed);
-		}, () => {});
+		}, (media) => {
+			bus.media = media;
+			bus.$emit("changeView", "MainViewController");
+		});
+	},
+	methods: {
+		cancelClicked: function () {
+			this.shouldContinue = false;
+			bus.$emit("changeView", "UploadViewController");
+		}
 	}
 });
 
 
 Vue.component("MainViewController", {
+	template: "#MainView",
+	data: () => {
+		return {
+			media: bus.media,
+			visibleMedia: bus.media.slice(0, 10)
+		}
+	},
+	created: function() {
+		let vm = this;
+	},
 	methods: {
 		select: function(n) {
 			bus.$emit("select", n);
-			bus.$emit("test");
 		}
 	},
-	template: `#main-template`
 });
 
-Vue.component("sidebar-row", {
+Vue.component("media-row", {
+	template: "#media-row",
 	props: ["src", "title", "dimensions", "subtitle", "id"],
 	created: function() {
 		let vm = this;
@@ -94,27 +113,17 @@ Vue.component("sidebar-row", {
 		return {
 			selected: false
 		};
-	},
-	template: `
-	<article class="media">
-	<div v-if = "selected" class = "selection-overlay"></div>
-	<figure class="media-left">
-	<p class="image is-64x64">
-	<img :src="src">
-	</p>
-	</figure>
-	<div class="media-content">
-	<div class="content" :class = "{selected: selected}">
-	<p>
-	<strong :class = "{selected: selected}">{{ title }}</strong>
-	<small>{{ dimensions }}</small>
-	<br>
-	{{ subtitle }}
-	</p>
-	</div>
-	</div>
-	</article>
-	`
+	}
+});
+
+Vue.component("load-row", {
+	template: "#load-row",
+	methods: {
+		requestMore: function() {
+			bus.$emit("requestMore");
+			alert("hi meme!");
+		}
+	}2
 });
 
 let screens = new Vue({

@@ -3,29 +3,33 @@
 <head>
 	<link rel = "stylesheet" href = "styles/framework/bulma.min.css" type = "text/css" />
 	<link rel = "stylesheet" href = "styles/framework/font-awesome.min.css" type = "text/css" />
-	<link rel = "stylesheet" href = "styles/upload-view.css" type = "text/css" />
-	<link rel = "stylesheet" href = "styles/scan-view.css" type = "text/css" />
-	<link rel = "stylesheet" href = "styles/main-view.css" type = "text/css" />
-	<link rel = "import" href = "views/upload-view.html" />
-	<link rel = "import" href = "views/scan-view.html" />
-	<link rel = "import" href = "views/main-view.html" />
+	<link rel = "stylesheet" href = "styles/UploadView.css" type = "text/css" />
+	<link rel = "stylesheet" href = "styles/ScanView.css" type = "text/css" />
+	<link rel = "stylesheet" href = "styles/MainView.css" type = "text/css" />
+	<style>
+		.fade-enter-active, .fade-leave-active {
+			transition: opacity .4s
+		}
+		.fade-enter, .fade-leave-active {
+			opacity: 0
+		}
+	</style>
 	<script src="https://unpkg.com/vue@2.0.0/dist/vue.js"></script>
 	<script>
-		window.onload = () => {
-			let imports = document.querySelectorAll('link[rel="import"]');
-			imports.forEach((link) => {
-				let template = link.import.querySelector("template");
-				document.body.appendChild(document.importNode(template, true));
-			});
-		};
+		const {remote, webFrame, ipcRenderer} = require("electron"); // External module imports
+		webFrame.setZoomLevelLimits(1, 1); // Disable zooming for the entire window
+		let NotificationCenter = new Vue(); // For inter-component communication
+		let supportedFileTypes = ["png", "jpg"];
 	</script>
-	<script src = "controllers/ContainerViewController.js" defer></script>
+	<script src = "controllers/UploadViewController.js"></script>
+	<script src = "controllers/ScanViewController.js"></script>
+	<script src = "controllers/MainViewController.js"></script>
+	<script src = "controllers/NavigationViewController.js" defer></script>
 </head>
 <body>
-	<div id = "container">
+	<div id = "NavigationViewController">
 		<transition name = "fade" mode = "out-in" appear>
-			<component :is = "screen"></component>
-			<p>hi</p>
+			<component :is = "visibleViewController"></component>
 		</transition>
 	</div>
 </body>

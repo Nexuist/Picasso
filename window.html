@@ -9,6 +9,7 @@
 </head>
 <body>
 	<div id = "root">
+		<!-- Upload Screen -->
 		<transition name = "fade" appear>
 			<div class = "hero is-fullheight is-light" id = "uploadScreen" v-if = "screen == 'upload'" key = "upload">
 				<div class = "hero-body">
@@ -26,11 +27,15 @@
 				</div>
 			</div>
 		</transition>
+		<!-- Main Screen -->
 		<transition name = "fade" appear>
 		<div id = "mainScreen" v-if = "screen == 'main'" key = "main" v-on:keyup.right = "changeImage(1)" v-on:keyup.left = "changeImage(-1)" tabindex = "-1">
+			<!-- Image -->
 			<img class = "fitted" v-if = "currentImage" :src = "currentImage.fileURL" onload = "root.toolbarEnabled = true" /> 
+			<!-- Toolbar -->
 			<nav class = "nav">
-				<div class = "nav-left" v-if = "currentImage">
+				<!-- Metadata -->
+				<div class = "nav-left" v-if = "toolbarEnabled">
 					<a class = "nav-item">{{currentImage.name}}</a>
 					<a class = "nav-item">{{currentImage.width}}x{{currentImage.height}}</a>
 					<a class = "nav-item">{{currentImage.size}}MB</a>
@@ -39,15 +44,19 @@
 				<div class = "nav-left" v-else>
 					<a class = "nav-item"><i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>  Scanning...</a>
 				</div>
+				<!-- Buttons -->
 				<!-- is-active to keep visible on mobile -->
 				<div class = "nav-right is-active">
 					<span class = "nav-item">
-						<a class = "button is-outlined" :class = "{ 'is-disabled': !toolbarEnabled }"><fa icon = "external-link" /></a>
-						<a class = "button is-outlined is-warning" :class = "{ 'is-disabled': !toolbarEnabled }"><fa icon = "search-plus" /></a>
-						<a class = "button is-outlined is-primary" :class = "{ 'is-disabled': !toolbarEnabled }"><fa icon = "folder" /></a>
-						<a class = "button is-outlined is-danger" :class = "{ 'is-disabled': !toolbarEnabled }"><fa icon = "trash" /></a>
+						<btn icon = "external-link" :disabled = "!toolbarEnabled"></btn>
+						<btn icon = "search-plus" class = "is-warning" :disabled = "!toolbarEnabled"></btn>
+						<btn icon = "folder" class = "is-primary" :disabled = "!toolbarEnabled"></btn>
+						<btn icon = "trash" class = "is-danger" :disabled = "!toolbarEnabled"></btn>
+						<btn icon = "chevron-circle-left" :disabled = "!toolbarEnabled"></btn>
+						<btn icon = "chevron-circle-right" :disabled = "!toolbarEnabled"></btn>
+<!-- 
 						<a v-on:click = "changeImage(-1)" class = "button is-outlined" :class = "{ 'is-disabled': !toolbarEnabled }"><fa icon = "chevron-circle-left" /></a>
-						<a v-on:click = "changeImage(1)" class = "button is-outlined" :class = "{ 'is-disabled': !toolbarEnabled }"><fa icon = "chevron-circle-right" /></a>
+						<a v-on:click = "changeImage(1)" class = "button is-outlined" :class = "{ 'is-disabled': !toolbarEnabled }"><fa icon = "chevron-circle-right" /></a> -->
 					</span>
 				</div>
 			</nav>

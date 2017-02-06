@@ -5,12 +5,14 @@ webFrame.setZoomLevelLimits(1, 1); // Disable zooming for the entire window
 
 let supportedFileTypes = ["png", "jpg"];
 
-Vue.component("fa", {
-	props: ["icon"],
+Vue.component("btn", {
+	props: ["icon", "disabled"],
 	template: `
-		<span class = "icon">
-			<i :class = "'fa fa-' + icon"></i>
-		</span>
+		<a class = "button is-outlined" :class = "{ 'is-disabled': disabled }">
+			<span class = "icon">
+				<i :class = "'fa fa-' + icon"></i>
+			</span>
+		</a>
 	`
 });
 

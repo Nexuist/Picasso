@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel = "stylesheet" href = "https://opensource.keycdn.com/fontawesome/4.7.0/font-awesome.min.css " type = "text/css" />
+	<link rel = "stylesheet" href = "http://cdnjs.cloudflare.com/ajax/libs/bulma/0.3.1/css/bulma.min.css" type = "text/css" />
+	<link rel = "stylesheet" href = "window.css" />
+	<script src="https://unpkg.com/vue@2.0.0/dist/vue.js"></script>
+	<script src = "window.js" defer></script>
+</head>
+<body>
+	<div id = "root">
+		<transition name = "fade" appear>
+			<div class = "hero is-fullheight is-light" id = "uploadScreen" v-if = "screen == 'upload'" key = "upload">
+				<div class = "hero-body">
+					<div class = "container has-text-centered">
+						<h1 class = "title">Drag in a folder.</h1>
+						<a v-on:click = "onChooseFolderPressed" class = "button is-dark is-outlined">
+							<span class = "icon">
+								<i class = "fa fa-folder-open"></i>
+							</span>
+							<span>Or, choose a folder</span>
+						</a>
+						<h5>{{uploadLabel}}</h5>
+						<br/>
+					</div>
+				</div>
+			</div>
+		</transition>
+		<transition name = "fade" appear>
+		<div id = "mainScreen" v-if = "screen == 'main'" key = "main">
+			<img class = "fitted" v-if = "currentImage" :src = "currentImage.fileURL" /> 
+			<nav class = "nav">
+				<div class = "nav-left" v-if = "currentImage">
+					<a class = "nav-item">{{currentImage.name}}</a>
+					<a class = "nav-item">{{currentImage.width}}x{{currentImage.height}}</a>
+					<a class = "nav-item">{{currentImage.size}}MB</a>
+				</div>
+				<div class = "nav-left" v-else>
+					<a class = "nav-item"><i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>  Scanning...</a>
+				</div>
+				<!-- is-active to keep visible on mobile -->
+				<div class = "nav-right is-active">
+					<span class = "nav-item">
+						<a class = "button is-outlined" :class = "{ 'is-disabled': !toolbarEnabled }"><fa icon = "external-link" /></a>
+						<a class = "button is-outlined is-warning" :class = "{ 'is-disabled': !toolbarEnabled }"><fa icon = "search-plus" /></a>
+						<a class = "button is-outlined is-primary" :class = "{ 'is-disabled': !toolbarEnabled }"><fa icon = "folder" /></a>
+						<a class = "button is-outlined is-danger" :class = "{ 'is-disabled': !toolbarEnabled }"><fa icon = "trash" /></a>
+						<a class = "button is-outlined" :class = "{ 'is-disabled': !toolbarEnabled }"><fa icon = "chevron-circle-left" /></a>
+						<a class = "button is-outlined" :class = "{ 'is-disabled': !toolbarEnabled }"><fa icon = "chevron-circle-right" /></a>
+					</span>
+				</div>
+			</nav>
+		</div>	
+	</transition>
+</div>
+</body>
+</html>

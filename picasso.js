@@ -12,7 +12,7 @@ function start() {
 		minHeight: 240,
 		backgroundColor: "#f5f5f5"
 	});
-	load("main");
+	load("window");
 	window.on("close", () => {
 		window = null;
 	});

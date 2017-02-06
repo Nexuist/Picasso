@@ -36,7 +36,7 @@ function scanFile(path, completeCallback) {
           type: "error",
           error: err
         });
-        return;0
+        return;
       }
       width = dimensions.width;
       height = dimensions.height;

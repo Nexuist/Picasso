@@ -27,7 +27,7 @@
 			</div>
 		</transition>
 		<transition name = "fade" appear>
-		<div id = "mainScreen" v-if = "screen == 'main'" key = "main">
+		<div id = "mainScreen" v-if = "screen == 'main'" key = "main" v-on:keyup.right = "changeImage(1)" v-on:keyup.left = "changeImage(-1)" tabindex = "-1">
 			<img class = "fitted" v-if = "currentImage" :src = "currentImage.fileURL" onload = "root.toolbarEnabled = true" /> 
 			<nav class = "nav">
 				<div class = "nav-left" v-if = "currentImage">

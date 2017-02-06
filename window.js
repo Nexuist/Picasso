@@ -63,6 +63,7 @@ let root = new Vue({
 				.catch(alert);
 		},
 		changeImage: function(increment) {
+			root.toolbarEnabled = false; // When the image loads, this will get set back to true
 			root.index = root.index + increment;
 			if (root.index < 0) root.index = root.images.length - 1;
 			if (root.index >= root.images.length) root.index = 0;

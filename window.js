@@ -58,7 +58,6 @@ let root = new Vue({
 			helper.getImagePaths(folder)
 				.then((images) => {
 					root.images = images;
-					console.log(images);
 					root.changeImage(1);
 				})
 				.catch(alert);
@@ -70,7 +69,6 @@ let root = new Vue({
 			helper.getImageDetails(root.images[root.index])
 				.then((details) => {
 					root.currentImage = details;
-					console.log(details);
 				})
 				.catch(alert)
 		}

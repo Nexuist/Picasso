@@ -28,7 +28,7 @@
 		</transition>
 		<transition name = "fade" appear>
 		<div id = "mainScreen" v-if = "screen == 'main'" key = "main">
-			<img class = "fitted" v-if = "currentImage" :src = "currentImage.fileURL" /> 
+			<img class = "fitted" v-if = "currentImage" :src = "currentImage.fileURL" onload = "root.toolbarEnabled = true" /> 
 			<nav class = "nav">
 				<div class = "nav-left" v-if = "currentImage">
 					<a class = "nav-item">{{currentImage.name}}</a>
@@ -45,8 +45,8 @@
 						<a class = "button is-outlined is-warning" :class = "{ 'is-disabled': !toolbarEnabled }"><fa icon = "search-plus" /></a>
 						<a class = "button is-outlined is-primary" :class = "{ 'is-disabled': !toolbarEnabled }"><fa icon = "folder" /></a>
 						<a class = "button is-outlined is-danger" :class = "{ 'is-disabled': !toolbarEnabled }"><fa icon = "trash" /></a>
-						<a class = "button is-outlined" :class = "{ 'is-disabled': !toolbarEnabled }"><fa icon = "chevron-circle-left" /></a>
-						<a class = "button is-outlined" :class = "{ 'is-disabled': !toolbarEnabled }"><fa icon = "chevron-circle-right" /></a>
+						<a v-on:click = "changeImage(-1)" class = "button is-outlined" :class = "{ 'is-disabled': !toolbarEnabled }"><fa icon = "chevron-circle-left" /></a>
+						<a v-on:click = "changeImage(1)" class = "button is-outlined" :class = "{ 'is-disabled': !toolbarEnabled }"><fa icon = "chevron-circle-right" /></a>
 					</span>
 				</div>
 			</nav>

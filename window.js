@@ -25,8 +25,9 @@ let root = new Vue({
 		currentImage: null
 	},
 	created: function() {
-		document.addEventListener("dragover", event => event.preventDefault());
-		document.addEventListener("drop", this.onFolderDragged);
+		// Consider using v-on:drop?
+		// document.addEventListener("dragover", event => event.preventDefault());
+		// document.addEventListener("drop", this.onFolderDragged);
 	},
 	methods: {
 		onFolderDragged: function() {
@@ -64,6 +65,8 @@ let root = new Vue({
 		},
 		changeImage: function(increment) {
 			root.index = root.index + increment;
+			if (root.index < 0) root.index = root.images.length - 1;
+			if (root.index >= root.images.length) root.index = 0;
 			helper.getImageDetails(root.images[root.index])
 				.then((details) => {
 					root.currentImage = details;

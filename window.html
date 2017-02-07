@@ -31,8 +31,12 @@
 		<!-- tabindex is needed to make the keyboard shortcuts work correctly -->
 		<transition name = "fade" appear>
 		<div id = "mainScreen" v-if = "screen == 'main'" key = "main" 
-			v-on:keyup.right = "changeImage(1)" 
 			v-on:keyup.left = "changeImage(-1)" 
+			v-on:keyup.a = "changeImage(-1)"
+			v-on:keyup.right = "changeImage(1)" 
+			v-on:keyup.d = "changeImage(1)"
+			v-on:keyup.x = "trash()"
+			v-on:keyup.z = "imageZoomed = !imageZoomed"
 			tabindex = "-1"
 		>
 			<!-- Image -->

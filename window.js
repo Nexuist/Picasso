@@ -6,6 +6,14 @@ webFrame.setZoomLevelLimits(1, 1); // Disable zooming for the entire window
 
 let supportedFileTypes = ["png", "jpg"];
 
+Vue.config.keyCodes = {
+	a: 65,
+	d: 68,
+	o: 79,
+	x: 88,
+	z: 90
+};
+
 Vue.component("btn", {
 	props: ["icon", "disabled"],
 	template: `
@@ -78,6 +86,8 @@ let root = new Vue({
 				.catch(alert)
 		},
 		trash: function() {
+			let confirmation = confirm(`Are you sure you want to delete '${root.currentImage.name}'?`);
+			if (!confirmation) return;
 			trashLib([root.images[root.index]])
 				.then(() => {
 					root.images.splice(root.index, 1);

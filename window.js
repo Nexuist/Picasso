@@ -1,5 +1,6 @@
 const {remote, webFrame, ipcRenderer} = require("electron"); // External module imports
 const helper = require("./helper");
+const trashLib = require("trash");
 
 webFrame.setZoomLevelLimits(1, 1); // Disable zooming for the entire window
 
@@ -24,7 +25,8 @@ let root = new Vue({
 		index: -1,
 		images: [],
 		toolbarEnabled: false,
-		currentImage: null
+		currentImage: null,
+		imageZoomed: false
 	},
 	created: function() {
 		// Consider using v-on:drop?
@@ -32,31 +34,31 @@ let root = new Vue({
 		// document.addEventListener("drop", this.onFolderDragged);
 	},
 	methods: {
-		onFolderDragged: function() {
+		folderDragged: function() {
 			event.preventDefault();
 			if (!event.dataTransfer.files || !event.dataTransfer.items) return;
 			let file = event.dataTransfer.files[0]; // Contains full path
 			let item = event.dataTransfer.items[0].webkitGetAsEntry(); // Allows us to find out if the uploaded file is a folder
 			if (!file || !item) return;
 			if (item.isDirectory) {
-				this.onFolderSelected(file.path);
+				this.selectFolder(file.path);
 				this.screen = "main";
 			}
 			else {
 				this.uploadLabel = "Sorry, you can only choose a folder.";
 			}
 		},
-		onChooseFolderPressed: function() {
+		chooseFolderPressed: function() {
 			remote.dialog.showOpenDialog(remote.getCurrentWindow(), {
 				properties: ["openDirectory"]
 			}, selectedFolders => {
 				if (selectedFolders) {
-					this.onFolderSelected(selectedFolders[0]);
+					this.selectFolder(selectedFolders[0]);
 					this.screen = "main";
 				}
 			});
 		},
-		onFolderSelected: function(folder) {
+		selectFolder: function(folder) {
 			helper.getImagePaths(folder)
 				.then((images) => {
 					root.images = images;
@@ -68,10 +70,23 @@ let root = new Vue({
 			root.toolbarEnabled = false; // When the image loads, this will get set back to true
 			root.index = root.index + increment;
 			if (root.index < 0) root.index = root.images.length - 1;
-			if (root.index >= root.images.length) root.index = 0;
+			if (root.index > root.images.length - 1) root.index = 0;
 			helper.getImageDetails(root.images[root.index])
 				.then((details) => {
 					root.currentImage = details;
+				})
+				.catch(alert)
+		},
+		trash: function() {
+			trashLib([root.images[root.index]])
+				.then(() => {
+					root.images.splice(root.index, 1);
+					if (root.images.length == 0) {
+						this.screen = "upload";
+					}
+					else {
+						root.changeImage(1);
+					}
 				})
 				.catch(alert)
 		}

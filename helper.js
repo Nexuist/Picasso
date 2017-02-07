@@ -9,7 +9,7 @@ module.exports = {
 				if (err) return reject(err);
 				files = files
 					.filter((file) => {
-						let ext = pathLib.extname(file).substring(1);
+						let ext = pathLib.extname(file).substring(1).toLowerCase();
 						return supportedFileTypes.indexOf(ext) > -1;
 					})
 					.map((file) => {

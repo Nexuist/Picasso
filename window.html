@@ -59,7 +59,7 @@
 				<!-- is-active to keep visible on mobile -->
 				<div class = "nav-right is-active">
 					<span class = "nav-item">
-						<btn icon = "external-link" :disabled = "!toolbarEnabled"></btn>
+						<btn icon = "external-link" v-on:click.native = "openExternal()" :disabled = "!toolbarEnabled"></btn>
 						<btn icon = "search-plus" v-on:click.native = "imageZoomed = !imageZoomed" class = "is-warning" :solid = "imageZoomed" :disabled = "!toolbarEnabled"></btn>
 						<btn icon = "folder" class = "is-primary" :disabled = "!toolbarEnabled"></btn>
 						<btn icon = "trash" class = "is-danger" v-on:click.native = "trash()" :solid = "trashRequested" :disabled = "!toolbarEnabled"></btn>

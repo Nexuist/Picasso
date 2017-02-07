@@ -1,4 +1,4 @@
-const {remote, webFrame, ipcRenderer} = require("electron"); // External module imports
+const {remote, webFrame, ipcRenderer, shell} = require("electron"); // External module imports
 const helper = require("./helper");
 const trashLib = require("trash");
 
@@ -105,6 +105,7 @@ let root = new Vue({
 				.catch(alert)
 				root.trashRequested = false;
 			}, 50);
-		}
+		},
+		openExternal: () => shell.openExternal("file://" + root.currentImage.fileURL)
 	}
 });

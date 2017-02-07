@@ -60,9 +60,9 @@
 				<div class = "nav-right is-active">
 					<span class = "nav-item">
 						<btn icon = "external-link" :disabled = "!toolbarEnabled"></btn>
-						<btn icon = "search-plus" v-on:click.native = "imageZoomed = !imageZoomed" class = "is-warning" :disabled = "!toolbarEnabled"></btn>
+						<btn icon = "search-plus" v-on:click.native = "imageZoomed = !imageZoomed" class = "is-warning" :solid = "imageZoomed" :disabled = "!toolbarEnabled"></btn>
 						<btn icon = "folder" class = "is-primary" :disabled = "!toolbarEnabled"></btn>
-						<btn icon = "trash" class = "is-danger" v-on:click.native = "trash()" :disabled = "!toolbarEnabled"></btn>
+						<btn icon = "trash" class = "is-danger" v-on:click.native = "trash()" :solid = "trashRequested" :disabled = "!toolbarEnabled"></btn>
 						<btn icon = "chevron-circle-left" v-on:click.native = "changeImage(-1)" :disabled = "!toolbarEnabled"></btn>
 						<btn icon = "chevron-circle-right" v-on:click.native = "changeImage(1)" :disabled = "!toolbarEnabled"></btn>
 					</span>

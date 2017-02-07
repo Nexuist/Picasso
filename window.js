@@ -2,9 +2,9 @@ const {remote, webFrame, ipcRenderer} = require("electron"); // External module 
 const helper = require("./helper");
 const trashLib = require("trash");
 
-webFrame.setZoomLevelLimits(1, 1); // Disable zooming for the entire window
+//webFrame.setZoomLevelLimits(1, 1); // Disable zooming for the entire window
 
-let supportedFileTypes = ["png", "jpg"];
+let supportedFileTypes = ["png", "jpg", "jpeg", "gif"];
 
 Vue.config.keyCodes = {
 	a: 65,
@@ -15,13 +15,13 @@ Vue.config.keyCodes = {
 };
 
 Vue.component("btn", {
-	props: ["icon", "disabled"],
+	props: ["icon", "disabled", "solid"],
 	template: `
-		<a class = "button is-outlined" :class = "{ 'is-disabled': disabled }">
-			<span class = "icon">
-				<i :class = "'fa fa-' + icon"></i>
-			</span>
-		</a>
+	<a class = "button" :class = "{ 'is-disabled': disabled, 'is-outlined': !solid }">
+		<span class = "icon">
+			<i :class = "'fa fa-' + icon"></i>
+		</span>
+	</a>
 	`
 });
 
@@ -34,7 +34,8 @@ let root = new Vue({
 		images: [],
 		toolbarEnabled: false,
 		currentImage: null,
-		imageZoomed: false
+		imageZoomed: false,
+		trashRequested: false
 	},
 	created: function() {
 		// Consider using v-on:drop?
@@ -68,11 +69,11 @@ let root = new Vue({
 		},
 		selectFolder: function(folder) {
 			helper.getImagePaths(folder)
-				.then((images) => {
-					root.images = images;
-					root.changeImage(1);
-				})
-				.catch(alert);
+			.then((images) => {
+				root.images = images;
+				root.changeImage(1);
+			})
+			.catch(alert);
 		},
 		changeImage: function(increment) {
 			root.toolbarEnabled = false; // When the image loads, this will get set back to true
@@ -80,15 +81,18 @@ let root = new Vue({
 			if (root.index < 0) root.index = root.images.length - 1;
 			if (root.index > root.images.length - 1) root.index = 0;
 			helper.getImageDetails(root.images[root.index])
-				.then((details) => {
-					root.currentImage = details;
-				})
-				.catch(alert)
+			.then((details) => {
+				root.currentImage = details;
+			})
+			.catch(alert)
 		},
 		trash: function() {
-			let confirmation = confirm(`Are you sure you want to delete '${root.currentImage.name}'?`);
-			if (!confirmation) return;
-			trashLib([root.images[root.index]])
+			root.trashRequested = true;
+			// Timeout is needed so icon can update before confirmation dialog blocks main thread
+			setTimeout(() => {
+				let confirmation = confirm(`Are you sure you want to delete '${root.currentImage.name}'?`);
+				if (!confirmation) return root.trashRequested = false;
+				trashLib([root.images[root.index]])
 				.then(() => {
 					root.images.splice(root.index, 1);
 					if (root.images.length == 0) {
@@ -99,6 +103,8 @@ let root = new Vue({
 					}
 				})
 				.catch(alert)
+				root.trashRequested = false;
+			}, 50);
 		}
 	}
 });

@@ -4,6 +4,8 @@ const trashLib = require("trash");
 
 //webFrame.setZoomLevelLimits(1, 1); // Disable zooming for the entire window
 
+let bus = new Vue();
+
 let supportedFileTypes = ["png", "jpg", "jpeg", "gif"];
 
 Vue.config.keyCodes = {
@@ -18,12 +20,37 @@ Vue.component("btn", {
 	props: ["icon", "disabled", "solid"],
 	template: `
 	<a class = "button" :class = "{ 'is-disabled': disabled, 'is-outlined': !solid }">
-		<span class = "icon">
+		<span v-if = "icon" class = "icon">
 			<i :class = "'fa fa-' + icon"></i>
 		</span>
+		<slot name = "text"></slot>
 	</a>
 	`
 });
+
+Vue.component("modal", {
+	props: ["active", "name"],
+	methods: {
+		clearModal: () => bus.$emit("clearModal")
+	},
+	template: `
+	<div class = "modal" :class = "{ 'is-active': active }">
+		<div class = "modal-background"></div>
+		<div class = "modal-card">
+			<header class = "modal-card-head">
+				<p class = "modal-card-title">{{ name }}</slot></p>
+				<a class = "button delete" v-on:click = "clearModal"></a>
+			</header>
+			<section class = "modal-card-body">
+				<slot name = "body"></slot>
+			</section>
+			<footer class = "modal-card-foot">
+				<slot name = "footer"></slot>
+			</footer>
+		</div>
+	</div>
+	`
+})
 
 let root = new Vue({
 	el: "#root",
@@ -35,13 +62,15 @@ let root = new Vue({
 		toolbarEnabled: false,
 		currentImage: null,
 		imageZoomed: false,
-		trashRequested: false,
-		renameRequested: false
+		activeModal: null
 	},
 	created: function() {
 		// Consider using v-on:drop?
 		// document.addEventListener("dragover", event => event.preventDefault());
 		// document.addEventListener("drop", this.onFolderDragged);
+		bus.$on("clearModal", () => {
+			root.activeModal = null;
+		});
 	},
 	methods: {
 		folderDragged: function() {
@@ -92,25 +121,21 @@ let root = new Vue({
 			.catch(alert);
 		},
 		trash: function() {
-			root.trashRequested = true;
-			// Timeout is needed so icon can update before confirmation dialog blocks main thread
-			setTimeout(() => {
-				let confirmation = confirm(`Are you sure you want to delete '${root.currentImage.name}'?`);
-				if (!confirmation) return root.trashRequested = false;
-				trashLib([root.images[root.index]])
-				.then(() => {
-					root.images.splice(root.index, 1);
-					if (root.images.length == 0) {
-						this.screen = "upload";
-					}
-					else {
-						root.changeImage(1);
-					}
-				})
-				.catch(alert)
-				root.trashRequested = false;
-			}, 50);
+			trashLib([root.images[root.index]])
+			.then(() => {
+				root.images.splice(root.index, 1);
+				if (root.images.length == 0) {
+					this.screen = "upload";
+				}
+				else {
+					root.changeImage(1);
+					root.activeModal = null;
+				}
+			})
+			.catch(alert);
 		},
-		openExternal: () => shell.openExternal("file://" + root.currentImage.fileURL)
+		openExternal: () => shell.openExternal("file://" + root.currentImage.fileURL),
+		setModal: (name) => root.activeModal = name,
+		modalShowing: (name) => name == root.activeModal
 	}
 });

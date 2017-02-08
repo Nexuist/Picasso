@@ -35,9 +35,9 @@
 			v-on:keyup.a = "changeImage(-1)"
 			v-on:keyup.right = "changeImage(1)" 
 			v-on:keyup.d = "changeImage(1)"
-			v-on:keyup.x = "trash()"
+			v-on:keyup.x = "activeModal = 'rename'"
 			v-on:keyup.z = "imageZoomed = !imageZoomed"
-			v-on:keyup.esc = "renameRequested = false"
+			v-on:keyup.esc = "setModal(null)"
 			tabindex = "-1"
 			>
 			<!-- Image -->
@@ -46,7 +46,7 @@
 			<nav class = "nav">
 				<!-- Metadata -->
 				<div class = "nav-left" v-if = "toolbarEnabled">
-					<a class = "nav-item" v-on:click = "renameRequested = true">{{currentImage.name}}</a>
+					<a class = "nav-item" v-on:click = "setModal('rename')">{{currentImage.name}}</a>
 					<a class = "nav-item">{{currentImage.width}}x{{currentImage.height}}</a>
 					<a class = "nav-item">{{currentImage.size}}MB</a>
 					<a class = "nav-item">
@@ -63,28 +63,26 @@
 						<btn icon = "external-link" v-on:click.native = "openExternal()" :disabled = "!toolbarEnabled"></btn>
 						<btn icon = "search-plus" v-on:click.native = "imageZoomed = !imageZoomed" class = "is-warning" :solid = "imageZoomed" :disabled = "!toolbarEnabled"></btn>
 						<btn icon = "folder" class = "is-primary" :disabled = "!toolbarEnabled"></btn>
-						<btn icon = "trash" class = "is-danger" v-on:click.native = "trash()" :solid = "trashRequested" :disabled = "!toolbarEnabled"></btn>
+						<btn icon = "trash" class = "is-danger" v-on:click.native = "setModal('trash')" :solid = "modalShowing('trash')" :disabled = "!toolbarEnabled"></btn>
 						<btn icon = "chevron-circle-left" v-on:click.native = "changeImage(-1)" :disabled = "!toolbarEnabled"></btn>
 						<btn icon = "chevron-circle-right" v-on:click.native = "changeImage(1)" :disabled = "!toolbarEnabled"></btn>
 					</span>
 				</div>
 			</nav>
 			<!-- Modals -->
-			<div class = "modal" :class = "{ 'is-active': renameRequested }">
-				<div class = "modal-background"></div>
-				<div class = "modal-card">
-					<header class = "modal-card-head">
-						<p class = "modal-card-title">Rename Image</p>
-						<a class = "button delete" v-on:click = "renameRequested = false"></a>
-					</header>
-					<section class = "modal-card-body">
-						<input class = "input" type = "text" :value = "currentImage ? currentImage.name : ''" />
-					</section>
-					<footer class = "modal-card-foot">
-					<p>hi
-					</footer>
+			<modal :active = "modalShowing('trash')" name = "Delete Image">
+				<div slot = "body">
+					<p>Are you sure you want to delete '{{currentImage ? currentImage.name : ''}}'?</p>
 				</div>
-			</div>
+				<div slot = "footer">
+					<btn icon = "trash" class = "is-danger" v-on:click.native = "trash()">
+						<p slot = "text">Delete</p>
+					</btn>
+					<btn v-on:click.native = "setModal(null)">
+						<p slot = "text">Cancel</p>
+					</btn>
+				</div>
+			</modal>
 			</div>
 		</div>	
 	</transition>

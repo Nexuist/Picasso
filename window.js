@@ -35,7 +35,8 @@ let root = new Vue({
 		toolbarEnabled: false,
 		currentImage: null,
 		imageZoomed: false,
-		trashRequested: false
+		trashRequested: false,
+		renameRequested: false
 	},
 	created: function() {
 		// Consider using v-on:drop?
@@ -51,7 +52,6 @@ let root = new Vue({
 			if (!file || !item) return;
 			if (item.isDirectory) {
 				this.selectFolder(file.path);
-				this.screen = "main";
 			}
 			else {
 				this.uploadLabel = "Sorry, you can only choose a folder.";
@@ -63,15 +63,20 @@ let root = new Vue({
 			}, selectedFolders => {
 				if (selectedFolders) {
 					this.selectFolder(selectedFolders[0]);
-					this.screen = "main";
 				}
 			});
 		},
 		selectFolder: function(folder) {
 			helper.getImagePaths(folder)
 			.then((images) => {
-				root.images = images;
-				root.changeImage(1);
+				if (images.length == 0) {
+					throw new Error("No supported files found in directory");
+				}
+				else {
+					root.images = images;
+					root.changeImage(1);
+					this.screen = "main";
+				}
 			})
 			.catch(alert);
 		},
@@ -84,7 +89,7 @@ let root = new Vue({
 			.then((details) => {
 				root.currentImage = details;
 			})
-			.catch(alert)
+			.catch(alert);
 		},
 		trash: function() {
 			root.trashRequested = true;

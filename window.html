@@ -30,22 +30,23 @@
 		<!-- Main Screen -->
 		<!-- tabindex is needed to make the keyboard shortcuts work correctly -->
 		<transition name = "fade" appear>
-		<div id = "mainScreen" v-if = "screen == 'main'" key = "main" 
+			<div id = "mainScreen" v-if = "screen == 'main'" key = "main" 
 			v-on:keyup.left = "changeImage(-1)" 
 			v-on:keyup.a = "changeImage(-1)"
 			v-on:keyup.right = "changeImage(1)" 
 			v-on:keyup.d = "changeImage(1)"
 			v-on:keyup.x = "trash()"
 			v-on:keyup.z = "imageZoomed = !imageZoomed"
+			v-on:keyup.esc = "renameRequested = false"
 			tabindex = "-1"
-		>
+			>
 			<!-- Image -->
 			<img :class = "{ 'fitted': !imageZoomed, 'zoomed': imageZoomed }" v-if = "currentImage" :src = "currentImage.fileURL" onload = "root.toolbarEnabled = true" /> 
 			<!-- Toolbar -->
 			<nav class = "nav">
 				<!-- Metadata -->
 				<div class = "nav-left" v-if = "toolbarEnabled">
-					<a class = "nav-item">{{currentImage.name}}</a>
+					<a class = "nav-item" v-on:click = "renameRequested = true">{{currentImage.name}}</a>
 					<a class = "nav-item">{{currentImage.width}}x{{currentImage.height}}</a>
 					<a class = "nav-item">{{currentImage.size}}MB</a>
 					<a class = "nav-item">
@@ -68,6 +69,23 @@
 					</span>
 				</div>
 			</nav>
+			<!-- Modals -->
+			<div class = "modal" :class = "{ 'is-active': renameRequested }">
+				<div class = "modal-background"></div>
+				<div class = "modal-card">
+					<header class = "modal-card-head">
+						<p class = "modal-card-title">Rename Image</p>
+						<a class = "button delete" v-on:click = "renameRequested = false"></a>
+					</header>
+					<section class = "modal-card-body">
+						<input class = "input" type = "text" :value = "currentImage ? currentImage.name : ''" />
+					</section>
+					<footer class = "modal-card-foot">
+					<p>hi
+					</footer>
+				</div>
+			</div>
+			</div>
 		</div>	
 	</transition>
 </div>

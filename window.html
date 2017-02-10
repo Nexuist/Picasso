@@ -35,7 +35,7 @@
 			v-on:keyup.a = "changeImage(-1)"
 			v-on:keyup.right = "changeImage(1)" 
 			v-on:keyup.d = "changeImage(1)"
-			v-on:keyup.x = "activeModal = 'rename'"
+			v-on:keyup.x = "toggleTrash()"
 			v-on:keyup.z = "imageZoomed = !imageZoomed"
 			v-on:keyup.esc = "setModal(null)"
 			tabindex = "-1"
@@ -74,14 +74,9 @@
 				<div slot = "body">
 					<p>Are you sure you want to delete '{{currentImage ? currentImage.name : ''}}'?</p>
 				</div>
-				<div slot = "footer">
-					<btn icon = "trash" class = "is-danger" v-on:click.native = "trash()">
-						<p slot = "text">Delete</p>
-					</btn>
-					<btn v-on:click.native = "setModal(null)">
-						<p slot = "text">Cancel</p>
-					</btn>
-				</div>
+				<btn slot = "footer" icon = "trash" class = "is-danger">
+					<p slot = "text">Delete</p>
+				</btn>
 			</modal>
 			</div>
 		</div>	

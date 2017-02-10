@@ -46,6 +46,10 @@ Vue.component("modal", {
 			</section>
 			<footer class = "modal-card-foot">
 				<slot name = "footer"></slot>
+				<br/>
+				<btn v-on:click.native = "clearModal">
+					<p slot = "text">Cancel</p>
+				</btn>
 			</footer>
 		</div>
 	</div>
@@ -129,13 +133,16 @@ let root = new Vue({
 				}
 				else {
 					root.changeImage(1);
-					root.activeModal = null;
+					root.setModal(null);
 				}
 			})
 			.catch(alert);
 		},
 		openExternal: () => shell.openExternal("file://" + root.currentImage.fileURL),
 		setModal: (name) => root.activeModal = name,
-		modalShowing: (name) => name == root.activeModal
+		modalShowing: (name) => name == root.activeModal,
+		toggleTrash: function() {
+			root.modalShowing("trash") ? root.trash() : root.setModal("trash"); // Show trash dialog if not showing already - else, execute the trash command
+ 		}
 	}
 });

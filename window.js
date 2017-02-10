@@ -140,9 +140,6 @@ let root = new Vue({
 		},
 		openExternal: () => shell.openExternal("file://" + root.currentImage.fileURL),
 		setModal: (name) => root.activeModal = name,
-		modalShowing: (name) => name == root.activeModal,
-		toggleTrash: function() {
-			root.modalShowing("trash") ? root.trash() : root.setModal("trash"); // Show trash dialog if not showing already - else, execute the trash command
- 		}
+		modalShowing: (name) => name == root.activeModal
 	}
 });

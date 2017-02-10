@@ -31,53 +31,63 @@
 		<!-- tabindex is needed to make the keyboard shortcuts work correctly -->
 		<transition name = "fade" appear>
 			<div id = "mainScreen" v-if = "screen == 'main'" key = "main" 
-			v-on:keyup.left = "changeImage(-1)" 
-			v-on:keyup.a = "changeImage(-1)"
-			v-on:keyup.right = "changeImage(1)" 
-			v-on:keyup.d = "changeImage(1)"
-			v-on:keyup.x = "toggleTrash()"
-			v-on:keyup.z = "imageZoomed = !imageZoomed"
+			v-on:keyup.left = "modalShowing(null) && changeImage(-1)" 
+			v-on:keyup.a = "modalShowing(null) && changeImage(-1)"
+			v-on:keyup.right = "modalShowing(null) && changeImage(1)" 
+			v-on:keyup.d = "modalShowing(null) && changeImage(1)"
+			v-on:keyup.x = "modalShowing('trash') ? trash() : (modalShowing(null) && setModal('trash'))"
+			v-on:keyup.z = "modalShowing(null) && (imageZoomed = !imageZoomed)"
 			v-on:keyup.esc = "setModal(null)"
 			tabindex = "-1"
 			>
-			<!-- Image -->
-			<img :class = "{ 'fitted': !imageZoomed, 'zoomed': imageZoomed }" v-if = "currentImage" :src = "currentImage.fileURL" onload = "root.toolbarEnabled = true" /> 
-			<!-- Toolbar -->
-			<nav class = "nav">
-				<!-- Metadata -->
-				<div class = "nav-left" v-if = "toolbarEnabled">
-					<a class = "nav-item" v-on:click = "setModal('rename')">{{currentImage.name}}</a>
-					<a class = "nav-item">{{currentImage.width}}x{{currentImage.height}}</a>
-					<a class = "nav-item">{{currentImage.size}}MB</a>
-					<a class = "nav-item">
-						{{index + 1}}/{{images.length}}
-					</a>
-				</div>
-				<div class = "nav-left" v-else>
-					<a class = "nav-item"><i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>  Scanning...</a>
-				</div>
-				<!-- Buttons -->
-				<!-- is-active to keep visible on mobile -->
-				<div class = "nav-right is-active">
-					<span class = "nav-item">
-						<btn icon = "external-link" v-on:click.native = "openExternal()" :disabled = "!toolbarEnabled"></btn>
-						<btn icon = "search-plus" v-on:click.native = "imageZoomed = !imageZoomed" class = "is-warning" :solid = "imageZoomed" :disabled = "!toolbarEnabled"></btn>
-						<btn icon = "folder" class = "is-primary" :disabled = "!toolbarEnabled"></btn>
-						<btn icon = "trash" class = "is-danger" v-on:click.native = "setModal('trash')" :solid = "modalShowing('trash')" :disabled = "!toolbarEnabled"></btn>
-						<btn icon = "chevron-circle-left" v-on:click.native = "changeImage(-1)" :disabled = "!toolbarEnabled"></btn>
-						<btn icon = "chevron-circle-right" v-on:click.native = "changeImage(1)" :disabled = "!toolbarEnabled"></btn>
-					</span>
-				</div>
-			</nav>
-			<!-- Modals -->
-			<modal :active = "modalShowing('trash')" name = "Delete Image">
-				<div slot = "body">
-					<p>Are you sure you want to delete '{{currentImage ? currentImage.name : ''}}'?</p>
-				</div>
-				<btn slot = "footer" icon = "trash" class = "is-danger">
-					<p slot = "text">Delete</p>
-				</btn>
-			</modal>
+				<!-- Image -->
+				<img :class = "{ 'fitted': !imageZoomed, 'zoomed': imageZoomed }" v-if = "currentImage" :src = "currentImage.fileURL" onload = "root.toolbarEnabled = true" /> 
+				<!-- Toolbar -->
+				<nav class = "nav">
+					<!-- Metadata -->
+					<div class = "nav-left" v-if = "toolbarEnabled">
+						<a class = "nav-item" v-on:click = "setModal('rename')">{{currentImage.name}}</a>
+						<a class = "nav-item">{{currentImage.width}}x{{currentImage.height}}</a>
+						<a class = "nav-item">{{currentImage.size}}MB</a>
+						<a class = "nav-item">
+							{{index + 1}}/{{images.length}}
+						</a>
+					</div>
+					<div class = "nav-left" v-else>
+						<a class = "nav-item"><i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>  Scanning...</a>
+					</div>
+					<!-- Buttons -->
+					<!-- is-active to keep visible on mobile -->
+					<div class = "nav-right is-active">
+						<span class = "nav-item">
+							<btn icon = "external-link" v-on:click.native = "openExternal()" :disabled = "!toolbarEnabled"></btn>
+							<btn icon = "search-plus" v-on:click.native = "imageZoomed = !imageZoomed" class = "is-warning" :solid = "imageZoomed" :disabled = "!toolbarEnabled"></btn>
+							<btn icon = "folder" class = "is-primary" :disabled = "!toolbarEnabled"></btn>
+							<btn icon = "trash" class = "is-danger" v-on:click.native = "setModal('trash')" :solid = "modalShowing('trash')" :disabled = "!toolbarEnabled"></btn>
+							<btn icon = "chevron-circle-left" v-on:click.native = "changeImage(-1)" :disabled = "!toolbarEnabled"></btn>
+							<btn icon = "chevron-circle-right" v-on:click.native = "changeImage(1)" :disabled = "!toolbarEnabled"></btn>
+						</span>
+					</div>
+				</nav>
+				<!-- Modals -->
+				<modal :active = "modalShowing('trash')" name = "Delete Image">
+					<div slot = "body">
+						<p>Are you sure you want to delete '{{currentImage ? currentImage.name : ''}}'?</p>
+					</div>
+					<btn slot = "footer" icon = "trash" class = "is-danger">
+						<p slot = "text">Delete</p>
+					</btn>
+				</modal>
+				<modal :active = "modalShowing('rename')" name = "Rename Image">
+					<div slot = "body">
+						<span v-if = "modalShowing('rename')">
+							<input class = "input" type = "text" :value = "currentImage.name" />
+						</span>
+					</div>
+					<btn slot = "footer" icon = "keyboard-o" class = "is-primary">
+						<p slot = "text">Rename</p>
+					</btn>
+				</modal>
 			</div>
 		</div>	
 	</transition>

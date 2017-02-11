@@ -22,7 +22,7 @@ module.exports = {
 	getImageDetails: (path) => {
 		return new Promise((resolve, reject) => {
 			details = {
-				name: pathLib.basename(path), 
+				name: pathLib.basename(path),
 				fileURL: path,
 				width: "?",
 				height: "?",

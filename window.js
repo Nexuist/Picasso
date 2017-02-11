@@ -66,7 +66,8 @@ let root = new Vue({
 		toolbarEnabled: false,
 		currentImage: null,
 		imageZoomed: false,
-		activeModal: null
+		activeModal: null,
+		inputValid: false
 	},
 	created: function() {
 		// Consider using v-on:drop?
@@ -133,11 +134,11 @@ let root = new Vue({
 				}
 				else {
 					root.changeImage(1);
-					root.setModal(null);
 				}
 			})
 			.catch(alert);
 		},
+		
 		openExternal: () => shell.openExternal("file://" + root.currentImage.fileURL),
 		setModal: (name) => root.activeModal = name,
 		modalShowing: (name) => name == root.activeModal

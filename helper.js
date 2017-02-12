@@ -1,6 +1,7 @@
 const fs = require("fs");
 const pathLib = require("path");
-const sizeOf = require("image-size");
+const trashLib = require("trash");
+const sizeLib = require("image-size");
 
 module.exports = {
 	getImagePaths: (folder) => {
@@ -21,8 +22,10 @@ module.exports = {
 	},
 	getImageDetails: (path) => {
 		return new Promise((resolve, reject) => {
+			let fullName = pathLib.basename(path)
 			details = {
-				name: pathLib.basename(path),
+				name: fullName.split(".")[0],
+				extension: fullName.split(".").pop().toLowerCase(),
 				fileURL: path,
 				width: "?",
 				height: "?",
@@ -31,12 +34,20 @@ module.exports = {
 			fs.stat(path, (err, stat) => {
 				if (err) return reject(err);
 				details.size = +(stat.size / 100000).toFixed(2); // Convert into MB with 2 decimal places at most
-				sizeOf(path, (err, dimensions) => {
+				sizeLib(path, (err, dimensions) => {
 					if (err) return reject(err);
 					details.width = dimensions.width;
 					details.height = dimensions.height;
 					resolve(details);
 				});
+			});
+		});
+	},
+	delete: (path) => trashLib(path),
+	rename: (oldPath, newPath) => {
+		return new Promise((resolve, reject) => {
+			fs.rename(oldPath, newPath, (err) => {
+				err ? reject(err) : resolve();
 			});
 		});
 	}

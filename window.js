@@ -1,6 +1,5 @@
 const {remote, webFrame, ipcRenderer, shell} = require("electron"); // External module imports
 const helper = require("./helper");
-const trashLib = require("trash");
 
 //webFrame.setZoomLevelLimits(1, 1); // Disable zooming for the entire window
 
@@ -126,7 +125,7 @@ let root = new Vue({
 			.catch(alert);
 		},
 		trash: function() {
-			trashLib([root.images[root.index]])
+			helper.trash([root.images[root.index]])
 			.then(() => {
 				root.images.splice(root.index, 1);
 				if (root.images.length == 0) {
@@ -138,7 +137,16 @@ let root = new Vue({
 			})
 			.catch(alert);
 		},
-		
+		rename: function(newNameWithoutExtension) {
+			let oldFileURL = root.currentImage.fileURL;
+			let newFileURL = oldFileURL.replace(root.currentImage.name, newNameWithoutExtension);
+			helper.rename(oldFileURL, newFileURL)
+				.then(() => {
+					root.images[root.index] = newFileURL; // Update cache
+					root.changeImage(0); // Reload current image
+				})
+				.catch(alert);
+		},
 		openExternal: () => shell.openExternal("file://" + root.currentImage.fileURL),
 		setModal: (name) => root.activeModal = name,
 		modalShowing: (name) => name == root.activeModal

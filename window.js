@@ -6,10 +6,11 @@ const pathLib = require("path");
 
 let bus = new Vue();
 
-let supportedFileTypes = ["png", "jpg", "jpeg", "gif"];
+let supportedFileTypes = ["png", "jpg", "jpeg", "gif", "mp4", "webm"];
 
 Vue.config.keyCodes = {
 	numeric: [49, 50, 51, 52, 53, 54, 55, 56, 57, 48],
+	space: 32,
 	left: [65, 37],
 	right: [68, 39],
 	g: 71,
@@ -134,11 +135,14 @@ let root = new Vue({
 				root.screen = "upload";
 				return;
 			}
-			helper.getImageDetails(root.images[root.index])
+			helper.getMediaDetails(root.images[root.index])
 			.then((details) => {
 				root.currentImage = details;
 			})
-			.catch(alert);
+			.catch((err) => {
+				alert(`Error while loading new image: ${err}`);
+				root.changeImage(1);
+			});
 		},
 		jump: function() {
 			let input = document.querySelector('input#jump');
@@ -200,6 +204,10 @@ let root = new Vue({
 					root.changeImage(0);
 				})
 				.catch(alert)
+		},
+		toggleVideoPlaying: () => {
+			let video = document.querySelector("video");
+			video.paused ? video.play() : video.pause();
 		},
 		openExternal: () => shell.openExternal("file://" + root.currentImage.fileURL),
 		setModal: (name) => root.activeModal = name,

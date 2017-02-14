@@ -26,11 +26,11 @@ body, html {
 	overflow: scroll;
 }
 
-#mainScreen img.zoomed {
+#mainScreen .zoomed {
 	max-width: none;
 }
 
-#mainScreen img.fitted {
+#mainScreen .fitted {
 	display: block;
 	margin: auto;
 	max-height: 100vh;

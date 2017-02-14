@@ -33,6 +33,7 @@
 			<div id = "mainScreen" v-if = "screen == 'main'" key = "main" 
 			v-on:keyup.left = "modalShowing(null) && changeImage(-1)" 
 			v-on:keyup.right = "modalShowing(null) && changeImage(1)" 
+			v-on:keyup.space = "toggleVideoPlaying()"
 			v-on:keyup.x = "modalShowing('trash') ? trash() : (modalShowing(null) && setModal('trash'))"
 			v-on:keyup.o = "setModal('destinations')"
 			v-on:keyup.g = "setModal('jump')"
@@ -42,7 +43,9 @@
 			tabindex = "-1"
 			>
 				<!-- Image -->
-				<img :class = "{ 'fitted': !imageZoomed, 'zoomed': imageZoomed }" v-if = "currentImage" :src = "currentImage.fileURL" onload = "root.toolbarEnabled = true" /> 
+				<img :class = "{ 'fitted': !imageZoomed, 'zoomed': imageZoomed }" v-if = "currentImage && !currentImage.isVideo" :src = "currentImage.fileURL" onload = "root.toolbarEnabled = true" /> 
+				<!-- Video -->
+				<video controls autoplay :src = "currentImage.fileURL" :class = "{ 'fitted': !imageZoomed, 'zoomed': imageZoomed }" v-if = "currentImage && currentImage.isVideo" v-on:canplay = "toolbarEnabled = true"></video>	
 				<!-- Toolbar -->
 				<nav class = "nav">
 					<!-- Metadata -->

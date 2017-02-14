@@ -4,6 +4,8 @@ const pathLib = require("path");
 const trashLib = require("trash");
 const sizeLib = require("image-size");
 
+const videoExtensions = ["webm", "mp4"];
+
 module.exports = {
 	getImagePaths: (path) => {
 		return new Promise((resolve, reject) => {
@@ -21,20 +23,23 @@ module.exports = {
 			});
 		});
 	},
-	getImageDetails: (path) => {
+	getMediaDetails: (path) => {
 		return new Promise((resolve, reject) => {
-			let fullName = pathLib.basename(path)
+			let fullName = pathLib.basename(path);
+			let extension = fullName.split(".").pop().toLowerCase();
 			details = {
 				name: fullName.split(".")[0],
-				extension: fullName.split(".").pop().toLowerCase(),
+				extension: extension,
 				fileURL: path,
+				isVideo: videoExtensions.indexOf(extension) > -1,
 				width: "?",
 				height: "?",
 				size: "?"
 			};
 			fs.stat(path, (err, stat) => {
-				if (err) return reject(err);
+				if (err) reject(err);
 				details.size = +(stat.size / 100000).toFixed(2); // Convert into MB with 2 decimal places at most
+				if (details.isVideo) return resolve(details);
 				sizeLib(path, (err, dimensions) => {
 					if (err) return reject(err);
 					details.width = dimensions.width;

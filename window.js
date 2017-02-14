@@ -1,5 +1,6 @@
 const {remote, webFrame, ipcRenderer, shell} = require("electron"); // External module imports
 const helper = require("./helper");
+const pathLib = require("path");
 
 //webFrame.setZoomLevelLimits(1, 1); // Disable zooming for the entire window
 
@@ -10,6 +11,7 @@ let supportedFileTypes = ["png", "jpg", "jpeg", "gif"];
 Vue.config.keyCodes = {
 	a: 65,
 	d: 68,
+	g: 71,
 	o: 79,
 	x: 88,
 	z: 90
@@ -62,7 +64,9 @@ let root = new Vue({
 		uploadLabel: "Supported Types: " + supportedFileTypes.join(", ").toUpperCase(),
 		index: -1,
 		images: [],
+		sortingFolders: [],
 		toolbarEnabled: false,
+		currentFolder: null,
 		currentImage: null,
 		imageZoomed: false,
 		activeModal: null,
@@ -70,8 +74,8 @@ let root = new Vue({
 	},
 	created: function() {
 		// Consider using v-on:drop?
-		// document.addEventListener("dragover", event => event.preventDefault());
-		// document.addEventListener("drop", this.onFolderDragged);
+		document.addEventListener("dragover", event => event.preventDefault());
+		document.addEventListener("drop", this.folderDragged);
 		bus.$on("clearModal", () => {
 			root.activeModal = null;
 		});
@@ -106,6 +110,13 @@ let root = new Vue({
 					throw new Error("No supported files found in directory");
 				}
 				else {
+					helper.getSettingsForFolder(folder)
+						.then((settings) => root.sortingFolders = settings.sortingFolders)
+						.catch((err) => {
+							if (err.code === "ENOENT") return;
+							alert("Problem while loading settings: " + err);
+						});
+					root.currentFolder = folder;
 					root.images = images;
 					root.changeImage(1);
 					this.screen = "main";
@@ -124,9 +135,16 @@ let root = new Vue({
 			})
 			.catch(alert);
 		},
+		jump: function() {
+			let input = document.querySelector('input#jump');
+			root.index = input.value - 1;
+			root.changeImage(0);
+			root.setModal(null);
+		},
 		trash: function() {
 			helper.trash([root.images[root.index]])
 			.then(() => {
+				root.setModal(null);
 				root.images.splice(root.index, 1);
 				if (root.images.length == 0) {
 					this.screen = "upload";
@@ -142,10 +160,41 @@ let root = new Vue({
 			let newFileURL = oldFileURL.replace(root.currentImage.name, newNameWithoutExtension);
 			helper.rename(oldFileURL, newFileURL)
 				.then(() => {
+					root.setModal(null);
 					root.images[root.index] = newFileURL; // Update cache
 					root.changeImage(0); // Reload current image
 				})
 				.catch(alert);
+		},
+		saveSettings: () => {
+			let settings = {
+				"version": "1.0",
+				sortingFolders: root.sortingFolders
+			};
+			helper.setSettingsForFolder(root.currentFolder, settings)
+				.catch(alert);
+		},
+		addDestination: () => {
+			remote.dialog.showOpenDialog(remote.getCurrentWindow(), {
+				properties: ["openDirectory"]
+			}, selectedFolders => {
+				if (selectedFolders) {
+					root.sortingFolders = root.sortingFolders.concat(selectedFolders);
+					root.saveSettings();
+				}
+			});
+		},
+		moveToDestination: (destination) => {
+			let oldFileURL = root.currentImage.fileURL;
+			let file = `${root.currentImage.name}.${root.currentImage.extension}`;
+			let newFileURL = pathLib.join(destination, file);
+			helper.rename(oldFileURL, newFileURL)
+				.then(() => {
+					root.images.splice(root.index, 1);
+					root.setModal(null);
+					root.changeImage(0);
+				})
+				.catch(alert)
 		},
 		openExternal: () => shell.openExternal("file://" + root.currentImage.fileURL),
 		setModal: (name) => root.activeModal = name,

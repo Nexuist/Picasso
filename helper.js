@@ -1,12 +1,13 @@
+const APP_VERSION = "1.0";
 const fs = require("fs");
 const pathLib = require("path");
 const trashLib = require("trash");
 const sizeLib = require("image-size");
 
 module.exports = {
-	getImagePaths: (folder) => {
+	getImagePaths: (path) => {
 		return new Promise((resolve, reject) => {
-			fs.readdir(folder, (err, files) => {
+			fs.readdir(path, (err, files) => {
 				if (err) return reject(err);
 				files = files
 					.filter((file) => {
@@ -14,7 +15,7 @@ module.exports = {
 						return supportedFileTypes.indexOf(ext) > -1;
 					})
 					.map((file) => {
-						return pathLib.join(folder, file);
+						return pathLib.join(path, file);
 					});
 				resolve(files);
 			});
@@ -30,7 +31,7 @@ module.exports = {
 				width: "?",
 				height: "?",
 				size: "?"
-			}
+			};
 			fs.stat(path, (err, stat) => {
 				if (err) return reject(err);
 				details.size = +(stat.size / 100000).toFixed(2); // Convert into MB with 2 decimal places at most
@@ -43,7 +44,29 @@ module.exports = {
 			});
 		});
 	},
-	delete: (path) => trashLib(path),
+	getSettingsForFolder: (path) => {
+		return new Promise((resolve, reject) => {
+			fs.readFile(pathLib.join(path, ".picasso"), "utf8", (err, data) => {
+				if (err) return reject(err);
+				var settings;
+				try {
+					settings = JSON.parse(data);
+				}
+				catch (err) {
+					return reject(err);
+				}
+				resolve(settings);
+			});
+		});
+	},
+	setSettingsForFolder: (path, settings) => {
+		return new Promise((resolve, reject) => {
+			fs.writeFile(pathLib.join(path, ".picasso"), JSON.stringify(settings), (err) => {
+				err ? reject(err) : resolve();
+			});
+		});
+	},
+	trash: (path) => trashLib(path),
 	rename: (oldPath, newPath) => {
 		return new Promise((resolve, reject) => {
 			fs.rename(oldPath, newPath, (err) => {

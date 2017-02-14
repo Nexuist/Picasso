@@ -36,6 +36,7 @@
 			v-on:keyup.right = "modalShowing(null) && changeImage(1)" 
 			v-on:keyup.d = "modalShowing(null) && changeImage(1)"
 			v-on:keyup.x = "modalShowing('trash') ? trash() : (modalShowing(null) && setModal('trash'))"
+			v-on:keyup.g = "setModal('jump')"
 			v-on:keyup.z = "modalShowing(null) && (imageZoomed = !imageZoomed)"
 			v-on:keyup.esc = "setModal(null)"
 			tabindex = "-1"
@@ -62,7 +63,7 @@
 						<span class = "nav-item">
 							<btn icon = "external-link" v-on:click.native = "openExternal()" :disabled = "!toolbarEnabled"></btn>
 							<btn icon = "search-plus" v-on:click.native = "imageZoomed = !imageZoomed" class = "is-warning" :solid = "imageZoomed" :disabled = "!toolbarEnabled"></btn>
-							<btn icon = "folder" class = "is-primary" :disabled = "!toolbarEnabled"></btn>
+							<btn icon = "folder" v-on:click.native = "setModal('destinations')" class = "is-primary" :disabled = "!toolbarEnabled"></btn>
 							<btn icon = "trash" class = "is-danger" v-on:click.native = "setModal('trash')" :solid = "modalShowing('trash')" :disabled = "!toolbarEnabled"></btn>
 							<btn icon = "chevron-circle-left" v-on:click.native = "changeImage(-1)" :disabled = "!toolbarEnabled"></btn>
 							<btn icon = "chevron-circle-right" v-on:click.native = "changeImage(1)" :disabled = "!toolbarEnabled"></btn>
@@ -74,7 +75,7 @@
 					<div slot = "body">
 						<p>Are you sure you want to delete '{{currentImage && currentImage.name}}'?</p>
 					</div>
-					<btn slot = "footer" icon = "trash" class = "is-danger" v-on:click.native = "trash(); setModal(null);">
+					<btn slot = "footer" icon = "trash" class = "is-danger" v-on:click.native = "trash()">
 						<p slot = "text">Delete</p>
 					</btn>
 				</modal>
@@ -93,8 +94,25 @@
 					<div slot = "body">
 						<input id = "jump" class = "input" type = "number" :min = "1" :max = "images.length" :class = "{ 'is-success': inputValid, 'is-danger': !inputValid }" :placeholder = "index + 1" v-on:change = "inputValid = $event.target.checkValidity()" />
 					</div>
-					<btn slot = "footer" class = "is-primary" :disabled = "!inputValid" v-on:click.native = "index = $event.target.ownerDocument.querySelector('input#jump').value - 1; changeImage(0); setModal(null);">
+					<btn slot = "footer" class = "is-primary" :disabled = "!inputValid" v-on:click.native = "jump()">
 						<p slot = "text">Jump</p>
+					</btn>
+				</modal>
+				<modal :active = "modalShowing('destinations')" name = "Destinations">
+					<div slot = "body">
+						<aside class = "menu" v-if = "sortingFolders.length > 0">
+							<ul class="menu-list">
+								<li v-for = "(folder, index) in sortingFolders">
+									<a v-on:click = "moveToDestination(folder)">
+									<b v-if = "index < 10">{{index == 9 ? 0 : index + 1}}.</b> {{folder}} <span class = "delete is-pulled-right" v-on:click.stop = "sortingFolders.splice(index, 1); saveSettings();"></span>
+									</a>
+								</li>
+  						</ul>
+						</aside>
+						<p v-else>You have not set up any destinations for this folder yet.</p>
+					</div>
+					<btn slot = "footer" class = "is-primary" v-on:click.native = "addDestination()">
+						<p slot = "text">Add Destination</p>
 					</btn>
 				</modal>
 			</div>

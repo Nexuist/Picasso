@@ -9,8 +9,9 @@ let bus = new Vue();
 let supportedFileTypes = ["png", "jpg", "jpeg", "gif"];
 
 Vue.config.keyCodes = {
-	a: 65,
-	d: 68,
+	numeric: [49, 50, 51, 52, 53, 54, 55, 56, 57, 48],
+	left: [65, 37],
+	right: [68, 39],
 	g: 71,
 	o: 79,
 	x: 88,
@@ -129,6 +130,10 @@ let root = new Vue({
 			root.index = root.index + increment;
 			if (root.index < 0) root.index = root.images.length - 1;
 			if (root.index > root.images.length - 1) root.index = 0;
+			if (root.images.length == 0) {
+				root.screen = "upload";
+				return;
+			}
 			helper.getImageDetails(root.images[root.index])
 			.then((details) => {
 				root.currentImage = details;
@@ -198,6 +203,7 @@ let root = new Vue({
 		},
 		openExternal: () => shell.openExternal("file://" + root.currentImage.fileURL),
 		setModal: (name) => root.activeModal = name,
-		modalShowing: (name) => name == root.activeModal
+		modalShowing: (name) => name == root.activeModal,
+		say: (msg) => console.log(msg)
 	}
 });

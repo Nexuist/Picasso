@@ -4,7 +4,7 @@
 	<link rel = "stylesheet" href = "https://opensource.keycdn.com/fontawesome/4.7.0/font-awesome.min.css " type = "text/css" />
 	<link rel = "stylesheet" href = "http://cdnjs.cloudflare.com/ajax/libs/bulma/0.3.1/css/bulma.min.css" type = "text/css" />
 	<link rel = "stylesheet" href = "window.css" />
-	<script src="https://unpkg.com/vue@2.0.0/dist/vue.js"></script>
+	<script src="https://unpkg.com/vue"></script>
 	<script src = "window.js" defer></script>
 </head>
 <body>
@@ -32,12 +32,12 @@
 		<transition name = "fade" appear>
 			<div id = "mainScreen" v-if = "screen == 'main'" key = "main" 
 			v-on:keyup.left = "modalShowing(null) && changeImage(-1)" 
-			v-on:keyup.a = "modalShowing(null) && changeImage(-1)"
 			v-on:keyup.right = "modalShowing(null) && changeImage(1)" 
-			v-on:keyup.d = "modalShowing(null) && changeImage(1)"
 			v-on:keyup.x = "modalShowing('trash') ? trash() : (modalShowing(null) && setModal('trash'))"
+			v-on:keyup.o = "setModal('destinations')"
 			v-on:keyup.g = "setModal('jump')"
 			v-on:keyup.z = "modalShowing(null) && (imageZoomed = !imageZoomed)"
+			v-on:keyup.numeric = "modalShowing('destinations') && sortingFolders.length >= $event.key && moveToDestination(sortingFolders[$event.key - 1])"
 			v-on:keyup.esc = "setModal(null)"
 			tabindex = "-1"
 			>

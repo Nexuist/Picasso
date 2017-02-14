@@ -15,6 +15,7 @@ Vue.config.keyCodes = {
 	right: [68, 39],
 	g: 71,
 	o: 79,
+	r: 82,
 	x: 88,
 	z: 90
 };

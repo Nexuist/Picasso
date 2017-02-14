@@ -74,6 +74,8 @@ module.exports = {
 	trash: (path) => trashLib(path),
 	rename: (oldPath, newPath) => {
 		return new Promise((resolve, reject) => {
+			console.log(fs.existsSync(newPath));
+			if (fs.existsSync(newPath)) return reject(`${newPath} already exists.`);
 			fs.rename(oldPath, newPath, (err) => {
 				err ? reject(err) : resolve();
 			});

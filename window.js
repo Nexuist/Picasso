@@ -15,6 +15,7 @@ Vue.config.keyCodes = {
 	right: [68, 39],
 	g: 71,
 	o: 79,
+	q: 81,
 	r: 82,
 	x: 88,
 	z: 90
@@ -140,10 +141,12 @@ let root = new Vue({
 			.then((details) => {
 				root.currentImage = details;
 			})
-			.catch((err) => {
-				alert(`Error while loading new image: ${err}`);
-				root.changeImage(1);
-			});
+			.catch(null);
+			// Find a better solution later
+			// .catch((err) => {
+			// 	alert(`Error while loading new image: ${err}`);
+			// 	root.changeImage(1);
+			// });
 		},
 		jump: function() {
 			let input = document.querySelector('input#jump');

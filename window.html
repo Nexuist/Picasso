@@ -36,6 +36,7 @@
 			v-on:keyup.space = "modalShowing(null) && toggleVideoPlaying()"
 			v-on:keyup.x = "modalShowing('trash') ? trash() : (modalShowing(null) && setModal('trash'))"
 			v-on:keyup.o = "modalShowing(null) && setModal('destinations')"
+			v-on:keyup.q = "modalShowing(null) && setModal('destinations')"
 			v-on:keyup.g = "modalShowing(null) && setModal('jump')"
 			v-on:keyup.r = "modalShowing(null) && setModal('rename')"
 			v-on:keyup.z = "modalShowing(null) && (imageZoomed = !imageZoomed)"
@@ -46,7 +47,7 @@
 				<!-- Image -->
 				<img :class = "{ 'fitted': !imageZoomed, 'zoomed': imageZoomed }" v-if = "currentImage && !currentImage.isVideo" :src = "currentImage.fileURL" onload = "root.toolbarEnabled = true" /> 
 				<!-- Video -->
-				<video controls autoplay :src = "currentImage.fileURL" :class = "{ 'fitted': !imageZoomed, 'zoomed': imageZoomed }" v-if = "currentImage && currentImage.isVideo" v-on:canplay = "toolbarEnabled = true"></video>	
+				<video controls autoplay loop :src = "currentImage.fileURL" :class = "{ 'fitted': !imageZoomed, 'zoomed': imageZoomed }" v-if = "currentImage && currentImage.isVideo" v-on:canplay = "toolbarEnabled = true"></video>	
 				<!-- Toolbar -->
 				<nav class = "nav">
 					<!-- Metadata -->

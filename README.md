@@ -23,6 +23,8 @@ To delete an image, hit the red trash can or press `X`. If you want to confirm t
 <img src = "Screenshots/Delete.png" alt = "Delete screen" width = "680px" />
 
 To rename an image, click its name in the bottom left to open the rename dialog. Type in a new name and click Rename to confirm.
+<img src = "Screenshots/Rename.png" alt = "Rename screen" width = "680px" />
+
 
 Finally, you can jump to a specific image quickly using the `G` key or by clicking the image number (to the right of the image size, it looks like "10/23"). Enter in a valid number and click Jump to confirm.
 <img src = "Screenshots/Jump.png" alt = "Jump screen" width = "680px" />
@@ -43,7 +45,8 @@ Finally, you can jump to a specific image quickly using the `G` key or by clicki
 
 ### License
 
-```MIT License
+```
+MIT License
 
 Copyright (c) 2017 Andi Andreas
 
@@ -63,4 +66,5 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.```
+SOFTWARE.
+```

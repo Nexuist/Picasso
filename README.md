@@ -19,12 +19,10 @@ You can click the magnifying glass or press `Z` to zoom in on your current image
 Picasso has a feature called Destinations that allows you to specify certain places where you can move images. Press `O` or `Q` to open Destinations (or click the green folder in the toolbar), and any one of the number keys specified to complete the action. Of course, you can click on each entry as well.
 <img src = "Screenshots/Destinations.png" alt = "Destinations screen" width = "680px" />
 
-
 To delete an image, hit the red trash can or press `X`. If you want to confirm the deletion quickly, you can hit `X` again with the dialog open.
 <img src = "Screenshots/Delete.png" alt = "Delete screen" width = "680px" />
 
 To rename an image, click its name in the bottom left to open the rename dialog. Type in a new name and click Rename to confirm.
-<img src = "Screenshots/Rename.png" alt = "Rename screen" width = "680px" />
 
 Finally, you can jump to a specific image quickly using the `G` key or by clicking the image number (to the right of the image size, it looks like "10/23"). Enter in a valid number and click Jump to confirm.
 <img src = "Screenshots/Jump.png" alt = "Jump screen" width = "680px" />

@@ -1,29 +1,21 @@
-const {app, BrowserWindow} = require("electron");
+const {app, BrowserWindow, ipcMain} = require("electron");
 
-let window = null; // Keep a reference to the main BrowserWindow at all times
-let debug = true;
+var openedWindows = 0;
 
-let load = (page) => window.loadURL(`file:///${__dirname}/${page}.html`);
+ipcMain.on("log", (event, arg) => console.log(arg)); // Allow logging to the console window
 
 /* Startup */
 function start() {
+	openedWindows--;
 	window = new BrowserWindow({
 		minWidth: 320,
 		minHeight: 240,
 		backgroundColor: "#f5f5f5"
 	});
-	load("window");
-	window.on("close", () => {
-		window = null;
-	});
+	window.loadURL(`file:///${__dirname}/window.html`);
+	window.on("close", () => openedWindows--);
 }
 
 app.on("ready", start);
-app.on("window-all-closed", () => {
-	// Stay active on macOS even when all windows are closed
-	if (process.platform !== "darwin" || debug) app.quit();
-});
-app.on("activate", () => {
-	// Recreate the window if it's closed and the app is open on macOS
-	if (window === null) start();
-});
+app.on("window-all-closed", () => (process.platform !== "darwin") && app.quit());	// Stay active on macOS even when all windows are closed
+app.on("activate", () => (openedWindows == 0) && start());	// Recreate the window if it's closed and the app is open on macOS

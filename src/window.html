@@ -11,18 +11,18 @@
 	<div id = "root">
 		<!-- Upload Screen -->
 		<transition name = "fade" appear>
-			<div class = "hero is-fullheight is-light" id = "uploadScreen" v-if = "screen == 'upload'" key = "upload">
+			<div class = "hero is-fullheight is-light blur-overlay-container" id = "uploadScreen" v-if = "screen == 'upload'" key = "upload" v-on:dragover.prevent = "folderCurrentlyBeingDragged = true" v-on:dragleave = "folderCurrentlyBeingDragged = false" v-on:drop.prevent = "folderCurrentlyBeingDragged = false; folderDragged()" :class = "{ 'blur-overlay': folderCurrentlyBeingDragged }">
 				<div class = "hero-body">
 					<div class = "container has-text-centered">
-						<h1 class = "title">Drag in a folder.</h1>
-						<a v-on:click = "chooseFolderPressed" class = "button is-dark is-outlined">
-							<span class = "icon">
-								<i class = "fa fa-folder-open"></i>
-							</span>
-							<span>Or, choose a folder</span>
+						<a v-on:click = "chooseFolderPressed">
+							<img src = "../icons/Icon_256x256.png">
 						</a>
-						<h5>{{uploadLabel}}</h5>
-						<br/>
+						<h5>{{helpLabel}}</h5>
+					</div>
+				</div>
+				<div class = "hero-footer">
+					<div class = "container has-text-centered">
+						Picasso v{{version}}. Currently supports {{supportedFileTypes.join(", ").toUpperCase()}}
 					</div>
 				</div>
 			</div>
@@ -32,6 +32,8 @@
 		<transition name = "fade" appear>
 			<div id = "mainScreen" v-if = "screen == 'main'" key = "main" 
 			v-on:keyup.left = "modalShowing(null) && changeImage(-1)" 
+			v-on:keyup.a = "modalShowing(null) && changeImage(-1)" 
+			v-on:keyup.d = "modalShowing(null) && changeImage(-1)" 
 			v-on:keyup.right = "modalShowing(null) && changeImage(1)" 
 			v-on:keyup.space = "modalShowing(null) && toggleVideoPlaying()"
 			v-on:keyup.x = "modalShowing('trash') ? trash() : (modalShowing(null) && setModal('trash'))"

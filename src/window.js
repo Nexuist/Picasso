@@ -13,6 +13,8 @@ Vue.config.keyCodes = {
 	space: 32,
 	left: [65, 37],
 	right: [68, 39],
+	a: 65,
+	d: 68,
 	g: 71,
 	o: 79,
 	q: 81,
@@ -61,11 +63,13 @@ Vue.component("modal", {
 	`
 })
 
+//uploadLabel: "Currently supported file types: " + supportedFileTypes.join(", ").toUpperCase(),
 let root = new Vue({
 	el: "#root",
 	data: {
 		screen: "upload",
-		uploadLabel: "Supported Types: " + supportedFileTypes.join(", ").toUpperCase(),
+		supportedFileTypes: supportedFileTypes,
+		helpLabel: "Drag in a folder or click the icon to manually select a folder.",
 		index: -1,
 		images: [],
 		sortingFolders: [],
@@ -74,19 +78,20 @@ let root = new Vue({
 		currentImage: null,
 		imageZoomed: false,
 		activeModal: null,
-		inputValid: false
+		inputValid: false,
+		folderCurrentlyBeingDragged: false,
+		version: 1.5
 	},
 	created: function() {
 		// Consider using v-on:drop?
-		document.addEventListener("dragover", event => event.preventDefault());
-		document.addEventListener("drop", this.folderDragged);
+		// document.addEventListener("dragover", event => event.preventDefault());
+		// document.addEventListener("drop", this.folderDragged);
 		bus.$on("clearModal", () => {
 			root.activeModal = null;
 		});
 	},
 	methods: {
 		folderDragged: function() {
-			event.preventDefault();
 			if (!event.dataTransfer.files || !event.dataTransfer.items) return;
 			let file = event.dataTransfer.files[0]; // Contains full path
 			let item = event.dataTransfer.items[0].webkitGetAsEntry(); // Allows us to find out if the uploaded file is a folder
@@ -95,7 +100,7 @@ let root = new Vue({
 				this.selectFolder(file.path);
 			}
 			else {
-				this.uploadLabel = "Sorry, you can only choose a folder.";
+				this.helpLabel = "Sorry, you can only choose a folder.";
 			}
 		},
 		chooseFolderPressed: function() {

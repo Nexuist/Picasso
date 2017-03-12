@@ -2,9 +2,7 @@ const {remote, webFrame, ipcRenderer, shell} = require("electron"); // External 
 const helper = require("./helper");
 const pathLib = require("path");
 
-//webFrame.setZoomLevelLimits(1, 1); // Disable zooming for the entire window
-
-let bus = new Vue();
+let bus = new Vue(); // Used to communicate between instances (mainly the modal and root ones)
 
 let supportedFileTypes = ["png", "jpg", "jpeg", "gif", "mp4", "webm"];
 
@@ -63,31 +61,67 @@ Vue.component("modal", {
 	`
 })
 
-//uploadLabel: "Currently supported file types: " + supportedFileTypes.join(", ").toUpperCase(),
+/*
+	data:
+		version (int) - Shown on upload page
+		screen (string) - Shows either upload or main page
+		supportedFileTypes [string] - Self explanatory
+		helpLabel (string) - Shown under icon on upload page
+		activeBlur (boolean) - Whether to blur the upload page or not (for when a file is dragged over it)
+		index (int) - Current index in media
+		media [string] - Array of image/video paths from current folder
+		destinations [string] - Array of folders loaded from settings
+		toolbarEnabled (boolean) - Self explanatory, toolbar is disabled between media loads
+		currentFolder (string) - Self explanatory
+		currentMedia (Object) - 
+			name - Media name sans extension
+			extension - Self explanatory
+			fileURL - Full URL to media
+			isVideo - Whether media is video or not
+			width - Self explanatory
+			height - Self explanatory
+			size - Media file size in megabytes
+		imageZoomed (boolean) - Used to determine which set of CSS to use for image
+		currentModal (string) - Name of modal being shown, if there is any
+		inputValid (boolean) - Used to determine outline of input boxes in modal forms
+	methods:
+		folderDragged() - Called when a folder is dropped into the upload screen
+		chooseFolderPressed() - Called when the button to select a folder is pressed in the upload screen
+		selectFolder() - Finalizes the folder to use for the main screen. Loads settings and media and switches to main screen
+		changeMedia(int increment) - Adds increment to index and loads the media at that index
+		jump() - Changes index to the current value in the jump modal input box and loads the media at that location
+		trash() - Trashes the media at the current index
+		rename(string newNameWithoutExtension) - Renames the current media
+		toggleVideoPlaying() - Self explanatory
+		openExternal() - Opens the fileURL in the operating system's handler of choice
+		setModal(string name) - Self explanatory
+		modalShowing(string name) - Whether name is the currentModal or not
+		moveToDestination(string destination) - Moves the current media to the folder specified
+		addDestination() - Prompt the user to select folders to add them to destinations, and saves the new settings
+		saveSettings() - Saves the current settings to a file ".picasso" in the currentFolder
+		say(string msg) - Logs a message to console
+*/
 let root = new Vue({
 	el: "#root",
 	data: {
+		version: 1.5,
 		screen: "upload",
 		supportedFileTypes: supportedFileTypes,
 		helpLabel: "Drag in a folder or click the icon to manually select a folder.",
+		activeBlur: false,
 		index: -1,
-		images: [],
-		sortingFolders: [],
+		media: [],
+		destinations: [],
 		toolbarEnabled: false,
 		currentFolder: null,
-		currentImage: null,
+		currentMedia: null,
 		imageZoomed: false,
-		activeModal: null,
-		inputValid: false,
-		folderCurrentlyBeingDragged: false,
-		version: 1.5
+		currentModal: null,
+		inputValid: false
 	},
 	created: function() {
-		// Consider using v-on:drop?
-		// document.addEventListener("dragover", event => event.preventDefault());
-		// document.addEventListener("drop", this.folderDragged);
 		bus.$on("clearModal", () => {
-			root.activeModal = null;
+			root.currentModal = null;
 		});
 	},
 	methods: {
@@ -96,131 +130,126 @@ let root = new Vue({
 			let file = event.dataTransfer.files[0]; // Contains full path
 			let item = event.dataTransfer.items[0].webkitGetAsEntry(); // Allows us to find out if the uploaded file is a folder
 			if (!file || !item) return;
-			if (item.isDirectory) {
-				this.selectFolder(file.path);
-			}
-			else {
-				this.helpLabel = "Sorry, you can only choose a folder.";
-			}
+			item.isDirectory ? root.selectFolder(file.path) : root.helpLabel = "Sorry, you can only choose a folder.";
 		},
 		chooseFolderPressed: function() {
 			remote.dialog.showOpenDialog(remote.getCurrentWindow(), {
 				properties: ["openDirectory"]
 			}, selectedFolders => {
 				if (selectedFolders) {
-					this.selectFolder(selectedFolders[0]);
+					root.selectFolder(selectedFolders[0]);
 				}
 			});
 		},
 		selectFolder: function(folder) {
 			helper.getImagePaths(folder)
-			.then((images) => {
-				if (images.length == 0) {
+			.then((media) => {
+				if (media.length == 0) {
 					throw new Error("No supported files found in directory");
 				}
 				else {
 					helper.getSettingsForFolder(folder)
-						.then((settings) => root.sortingFolders = settings.sortingFolders)
+						.then((settings) => root.destinations = settings.destinations)
 						.catch((err) => {
 							if (err.code === "ENOENT") return;
 							alert("Problem while loading settings: " + err);
 						});
 					root.currentFolder = folder;
-					root.images = images;
-					root.changeImage(1);
-					this.screen = "main";
+					root.media = media;
+					root.changeMedia(1);
+					root.screen = "main";
 				}
 			})
 			.catch(alert);
 		},
-		changeImage: function(increment) {
+		changeMedia: function(increment) {
 			root.toolbarEnabled = false; // When the image loads, this will get set back to true
 			root.index = root.index + increment;
-			if (root.index < 0) root.index = root.images.length - 1;
-			if (root.index > root.images.length - 1) root.index = 0;
-			if (root.images.length == 0) {
+			if (root.index < 0) root.index = root.media.length - 1;
+			if (root.index > root.media.length - 1) root.index = 0;
+			if (root.media.length == 0) {
 				root.screen = "upload";
 				return;
 			}
-			helper.getMediaDetails(root.images[root.index])
+			helper.getMediaDetails(root.media[root.index])
 			.then((details) => {
-				root.currentImage = details;
+				root.currentMedia = details;
 			})
 			.catch(null);
 			// Find a better solution later
 			// .catch((err) => {
 			// 	alert(`Error while loading new image: ${err}`);
-			// 	root.changeImage(1);
+			// 	root.changeMedia(1);
 			// });
 		},
 		jump: function() {
 			let input = document.querySelector('input#jump');
 			root.index = input.value - 1;
-			root.changeImage(0);
+			root.changeMedia(0);
 			root.setModal(null);
 		},
 		trash: function() {
-			helper.trash([root.images[root.index]])
+			helper.trash([root.media[root.index]])
 			.then(() => {
 				root.setModal(null);
-				root.images.splice(root.index, 1);
-				if (root.images.length == 0) {
-					this.screen = "upload";
+				root.media.splice(root.index, 1);
+				if (root.media.length == 0) {
+					root.screen = "upload";
 				}
 				else {
-					root.changeImage(1);
+					root.changeMedia(1);
 				}
 			})
 			.catch(alert);
 		},
 		rename: function(newNameWithoutExtension) {
-			let oldFileURL = root.currentImage.fileURL;
-			let newFileURL = oldFileURL.replace(root.currentImage.name, newNameWithoutExtension);
+			let oldFileURL = root.currentMedia.fileURL;
+			let newFileURL = oldFileURL.replace(root.currentMedia.name, newNameWithoutExtension);
 			helper.rename(oldFileURL, newFileURL)
 				.then(() => {
 					root.setModal(null);
-					root.images[root.index] = newFileURL; // Update cache
-					root.changeImage(0); // Reload current image
+					root.media[root.index] = newFileURL; // Update cache
+					root.changeMedia(0); // Reload current image
 				})
 				.catch(alert);
 		},
-		saveSettings: () => {
-			let settings = {
-				"version": "1.0",
-				sortingFolders: root.sortingFolders
-			};
-			helper.setSettingsForFolder(root.currentFolder, settings)
-				.catch(alert);
+		toggleVideoPlaying: () => {
+			let video = document.querySelector("video");
+			video.paused ? video.play() : video.pause();
+		},
+		openExternal: () => shell.openExternal("file://" + root.currentMedia.fileURL),
+		setModal: (name) => root.currentModal = name,
+		modalShowing: (name) => name == root.currentModal,
+		moveToDestination: (destination) => {
+			let oldFileURL = root.currentMedia.fileURL;
+			let file = `${root.currentMedia.name}.${root.currentMedia.extension}`;
+			let newFileURL = pathLib.join(destination, file);
+			helper.rename(oldFileURL, newFileURL)
+				.then(() => {
+					root.media.splice(root.index, 1);
+					root.setModal(null);
+					root.changeMedia(0);
+				})
+				.catch(alert)
 		},
 		addDestination: () => {
 			remote.dialog.showOpenDialog(remote.getCurrentWindow(), {
 				properties: ["openDirectory"]
 			}, selectedFolders => {
 				if (selectedFolders) {
-					root.sortingFolders = root.sortingFolders.concat(selectedFolders);
+					root.destinations = root.destinations.concat(selectedFolders);
 					root.saveSettings();
 				}
 			});
 		},
-		moveToDestination: (destination) => {
-			let oldFileURL = root.currentImage.fileURL;
-			let file = `${root.currentImage.name}.${root.currentImage.extension}`;
-			let newFileURL = pathLib.join(destination, file);
-			helper.rename(oldFileURL, newFileURL)
-				.then(() => {
-					root.images.splice(root.index, 1);
-					root.setModal(null);
-					root.changeImage(0);
-				})
-				.catch(alert)
+		saveSettings: () => {
+			let settings = {
+				"version": root.version,
+				destinations: root.destinations
+			};
+			helper.setSettingsForFolder(root.currentFolder, settings)
+				.catch(alert);
 		},
-		toggleVideoPlaying: () => {
-			let video = document.querySelector("video");
-			video.paused ? video.play() : video.pause();
-		},
-		openExternal: () => shell.openExternal("file://" + root.currentImage.fileURL),
-		setModal: (name) => root.activeModal = name,
-		modalShowing: (name) => name == root.activeModal,
 		say: (msg) => console.log(msg)
 	}
 });

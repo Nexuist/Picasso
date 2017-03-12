@@ -6,23 +6,32 @@
 	<link rel = "stylesheet" href = "window.css" />
 	<script src="https://unpkg.com/vue"></script>
 	<script src = "window.js" defer></script>
+	<script async src = "http://platform.twitter.com/widgets.js" charset = "utf-8"></script>
 </head>
 <body>
 	<div id = "root">
 		<!-- Upload Screen -->
 		<transition name = "fade" appear>
-			<div class = "hero is-fullheight is-light blur-overlay-container" id = "uploadScreen" v-if = "screen == 'upload'" key = "upload" v-on:dragover.prevent = "folderCurrentlyBeingDragged = true" v-on:dragleave = "folderCurrentlyBeingDragged = false" v-on:drop.prevent = "folderCurrentlyBeingDragged = false; folderDragged()" :class = "{ 'blur-overlay': folderCurrentlyBeingDragged }">
+			<div 
+				id = "uploadScreen" 
+				v-if = "screen == 'upload'" 
+				key = "upload" 
+				class = "hero is-fullheight is-light blur-overlay-container" 
+				v-on:dragover.prevent = "activeBlur = true" 
+				v-on:dragleave = "activeBlur = false" 
+				v-on:drop.prevent = "activeBlur = false; folderDragged()" 
+				:class = "{ 'blur-overlay': activeBlur }"
+			>
 				<div class = "hero-body">
 					<div class = "container has-text-centered">
 						<a v-on:click = "chooseFolderPressed">
 							<img src = "../icons/Icon_256x256.png">
 						</a>
 						<h5>{{helpLabel}}</h5>
-					</div>
-				</div>
-				<div class = "hero-footer">
-					<div class = "container has-text-centered">
-						Picasso v{{version}}. Currently supports {{supportedFileTypes.join(", ").toUpperCase()}}
+						<h5>Picasso v{{version}}. Currently supports: {{supportedFileTypes.join(", ").toUpperCase()}}</h5>
+						<br/>
+						<p>Need help or want to send feedback?</p>
+						<a href = "https://twitter.com/nexuist" class = "twitter-follow-button" data-size = "large" data-dnt = "true" data-show-count = "false">Follow @nexuist</a>
 					</div>
 				</div>
 			</div>

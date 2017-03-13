@@ -20,7 +20,7 @@
 				v-on:dragover.prevent = "activeBlur = true" 
 				v-on:dragleave = "activeBlur = false" 
 				v-on:drop.prevent = "activeBlur = false; folderDragged()" 
-				:class = "{ 'blur-overlay': activeBlur }"
+				:class = "{'blur-overlay': activeBlur}"
 			>
 				<div class = "hero-body">
 					<div class = "container has-text-centered">
@@ -40,10 +40,10 @@
 		<!-- tabindex is needed to make the keyboard shortcuts work correctly -->
 		<transition name = "fade" appear>
 			<div id = "mainScreen" v-if = "screen == 'main'" key = "main" 
-			v-on:keyup.left = "modalShowing(null) && changeImage(-1)" 
-			v-on:keyup.a = "modalShowing(null) && changeImage(-1)" 
-			v-on:keyup.d = "modalShowing(null) && changeImage(-1)" 
-			v-on:keyup.right = "modalShowing(null) && changeImage(1)" 
+			v-on:keyup.left = "modalShowing(null) && changeMedia(-1)" 
+			v-on:keyup.a = "modalShowing(null) && changeMedia(-1)" 
+			v-on:keyup.d = "modalShowing(null) && changeMedia(-1)" 
+			v-on:keyup.right = "modalShowing(null) && changeMedia(1)" 
 			v-on:keyup.space = "modalShowing(null) && toggleVideoPlaying()"
 			v-on:keyup.x = "modalShowing('trash') ? trash() : (modalShowing(null) && setModal('trash'))"
 			v-on:keyup.o = "modalShowing(null) && setModal('destinations')"
@@ -51,23 +51,23 @@
 			v-on:keyup.g = "modalShowing(null) && setModal('jump')"
 			v-on:keyup.r = "modalShowing(null) && setModal('rename')"
 			v-on:keyup.z = "modalShowing(null) && (imageZoomed = !imageZoomed)"
-			v-on:keyup.numeric = "modalShowing('destinations') && sortingFolders.length >= $event.key && moveToDestination(sortingFolders[$event.key - 1])"
+			v-on:keyup.numeric = "modalShowing('destinations') && destinations.length >= $event.key && moveToDestination(destinations[$event.key - 1])"
 			v-on:keyup.esc = "setModal(null)"
 			tabindex = "-1"
 			>
 				<!-- Image -->
-				<img :class = "{ 'fitted': !imageZoomed, 'zoomed': imageZoomed }" v-if = "currentImage && !currentImage.isVideo" :src = "currentImage.fileURL" onload = "root.toolbarEnabled = true" /> 
+				<img :class = "{ 'fitted': !imageZoomed, 'zoomed': imageZoomed }" v-if = "currentMedia && !currentMedia.isVideo" :src = "currentMedia.fileURL" onload = "root.toolbarEnabled = true" /> 
 				<!-- Video -->
-				<video controls autoplay loop :src = "currentImage.fileURL" :class = "{ 'fitted': !imageZoomed, 'zoomed': imageZoomed }" v-if = "currentImage && currentImage.isVideo" v-on:canplay = "toolbarEnabled = true"></video>	
+				<video controls autoplay loop :src = "currentMedia.fileURL" :class = "{ 'fitted': !imageZoomed, 'zoomed': imageZoomed }" v-if = "currentMedia && currentMedia.isVideo" v-on:canplay = "toolbarEnabled = true"></video>	
 				<!-- Toolbar -->
 				<nav class = "nav">
 					<!-- Metadata -->
 					<div class = "nav-left" v-if = "toolbarEnabled">
-						<a class = "nav-item" v-on:click = "setModal('rename')">{{currentImage.name}}.{{currentImage.extension}}</a>
-						<a class = "nav-item">{{currentImage.width}}x{{currentImage.height}}</a>
-						<a class = "nav-item">{{currentImage.size}}MB</a>
+						<a class = "nav-item" v-on:click = "setModal('rename')">{{currentMedia.name}}.{{currentMedia.extension}}</a>
+						<a class = "nav-item">{{currentMedia.width}}x{{currentMedia.height}}</a>
+						<a class = "nav-item">{{currentMedia.size}}MB</a>
 						<a class = "nav-item" v-on:click = "setModal('jump')">
-							{{index + 1}}/{{images.length}}
+							{{index + 1}}/{{media.length}}
 						</a>
 					</div>
 					<div class = "nav-left" v-else>
@@ -81,15 +81,15 @@
 							<btn icon = "search-plus" v-on:click.native = "imageZoomed = !imageZoomed" class = "is-warning" :solid = "imageZoomed" :disabled = "!toolbarEnabled"></btn>
 							<btn icon = "folder" v-on:click.native = "setModal('destinations')" class = "is-primary" :disabled = "!toolbarEnabled"></btn>
 							<btn icon = "trash" class = "is-danger" v-on:click.native = "setModal('trash')" :solid = "modalShowing('trash')" :disabled = "!toolbarEnabled"></btn>
-							<btn icon = "chevron-circle-left" v-on:click.native = "changeImage(-1)" :disabled = "!toolbarEnabled"></btn>
-							<btn icon = "chevron-circle-right" v-on:click.native = "changeImage(1)" :disabled = "!toolbarEnabled"></btn>
+							<btn icon = "chevron-circle-left" v-on:click.native = "changeMedia(-1)" :disabled = "!toolbarEnabled"></btn>
+							<btn icon = "chevron-circle-right" v-on:click.native = "changeMedia(1)" :disabled = "!toolbarEnabled"></btn>
 						</span>
 					</div>
 				</nav>
 				<!-- Modals -->
 				<modal :active = "modalShowing('trash')" name = "Delete Image">
 					<div slot = "body">
-						<p>Are you sure you want to delete '{{currentImage && currentImage.name}}'?</p>
+						<p>Are you sure you want to delete '{{currentMedia && currentMedia.name}}'?</p>
 					</div>
 					<btn slot = "footer" icon = "trash" class = "is-danger" v-on:click.native = "trash()">
 						<p slot = "text">Delete</p>
@@ -98,8 +98,8 @@
 				<modal :active = "modalShowing('rename')" name = "Rename Image">
 					<div slot = "body">
 						<p class = "control has-addons">
-							<input id = "rename" class = "input" type = "text" :value = "currentImage && currentImage.name" />
-							<a class = "button">.{{currentImage && currentImage.extension }}</a>
+							<input id = "rename" class = "input" type = "text" :value = "currentMedia && currentMedia.name" />
+							<a class = "button">.{{currentMedia && currentMedia.extension }}</a>
 						</p>
 					</div>
 					<btn slot = "footer" icon = "keyboard-o" class = "is-primary" v-on:click.native = "rename($event.target.ownerDocument.querySelector('input#rename').value); setModal(null);">
@@ -108,7 +108,7 @@
 				</modal>
 				<modal :active = "modalShowing('jump')" name = "Jump To Image">
 					<div slot = "body">
-						<input id = "jump" class = "input" type = "number" :min = "1" :max = "images.length" :class = "{ 'is-success': inputValid, 'is-danger': !inputValid }" :placeholder = "index + 1" v-on:change = "inputValid = $event.target.checkValidity()" />
+						<input id = "jump" class = "input" type = "number" :min = "1" :max = "media.length" :class = "{ 'is-success': inputValid, 'is-danger': !inputValid }" :placeholder = "index + 1" v-on:change = "inputValid = $event.target.checkValidity()" />
 					</div>
 					<btn slot = "footer" class = "is-primary" :disabled = "!inputValid" v-on:click.native = "jump()">
 						<p slot = "text">Jump</p>
@@ -116,11 +116,11 @@
 				</modal>
 				<modal :active = "modalShowing('destinations')" name = "Destinations">
 					<div slot = "body">
-						<aside class = "menu" v-if = "sortingFolders.length > 0">
+						<aside class = "menu" v-if = "destinations.length > 0">
 							<ul class="menu-list">
-								<li v-for = "(folder, index) in sortingFolders">
+								<li v-for = "(folder, index) in destinations">
 									<a v-on:click = "moveToDestination(folder)">
-									<b v-if = "index < 10">{{index == 9 ? 0 : index + 1}}.</b> {{folder}} <span class = "delete is-pulled-right" v-on:click.stop = "sortingFolders.splice(index, 1); saveSettings();"></span>
+									<b v-if = "index < 10">{{index == 9 ? 0 : index + 1}}.</b> {{folder}} <span class = "delete is-pulled-right" v-on:click.stop = "destinations.splice(index, 1); saveSettings();"></span>
 									</a>
 								</li>
   						</ul>
@@ -131,9 +131,8 @@
 						<p slot = "text">Add Destination</p>
 					</btn>
 				</modal>
-			</div>
-		</div>	
-	</transition>
-</div>
+			</div>	
+			</transition>
+	</div>
 </body>
 </html>

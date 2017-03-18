@@ -13,11 +13,16 @@ module.exports = {
 					.map((file) => pathLib.join(path, file)); // Remove unsupported file and apply full path to each file
 				var settings, settingsErr;
 				fs.readFile(pathLib.join(path, ".picasso"), "utf8", (err, data) => {
-					try {
-						settings = JSON.parse(data);
-					}
-					catch (err) {
+					if (err) {
 						settingsErr = err;
+					}
+					else {
+						try {
+							settings = JSON.parse(data);
+						}
+						catch (err) {
+							settingsErr = err;
+						}
 					}
 					resolve([files, settingsErr ? settingsErr : settings]);
 				});

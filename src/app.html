@@ -10,35 +10,35 @@
 	<script src = "app.js" defer></script>
 </head>
 <body>
-	<div 
-		id = "upload" 
-		class = "hero is-fullheight is-light blur-overlay-container"
-		v-on:dragover.prevent = "blur = true" 
-		v-on:dragleave = "blur = false" 
-		v-on:drop.prevent = "folderDragged" 
-		:class = "{'blur-overlay': blur}"
-		v-if = "show"
-	>
-		<div class = "hero-body">
-			<div class = "container has-text-centered">
-				<a v-on:click = "iconClicked">
-					<img src = "../icons/Icon_256x256.png">
-				</a>
-				<h5>{{label}}</h5>
-				<br />
-				<p>Files that can be viewed: {{supportedExts.join(", ").toUpperCase()}}</p>
-				<br />
-				<p>Need help or want to send feedback?</p>
-				<br />
-				<a href = "https://twitter.com/nexuist" class = "twitter-follow-button" data-size = "large" data-dnt = "true" data-show-count = "false">Follow @nexuist</a>
+		<div 
+			id = "upload" 
+			class = "hero is-fullheight is-light blur-overlay-container"
+			v-on:dragover.prevent = "blur = true" 
+			v-on:dragleave = "blur = false" 
+			v-on:drop.prevent = "folderDragged" 
+			:class = "{'blur-overlay': blur}"
+			v-if = "show"
+		>
+			<div class = "hero-body">
+				<div class = "container has-text-centered">
+					<a v-on:click = "iconClicked">
+						<img src = "../icons/Icon_256x256.png">
+					</a>
+					<h5>{{label}}</h5>
+					<br />
+					<p>Files that can be viewed: {{supportedExts.join(", ").toUpperCase()}}</p>
+					<br />
+					<p>Need help or want to send feedback?</p>
+					<br />
+					<a href = "https://twitter.com/nexuist" class = "twitter-follow-button" data-size = "large" data-dnt = "true" data-show-count = "false">Follow @nexuist</a>
+				</div>
 			</div>
 		</div>
-	</div>
 	<div
 		id = "main"
 		v-if = "show"
 	>
-		<p>hi</p>
+		<p>{{destinations}}</p>
 	</div>
 </body>
 </html>

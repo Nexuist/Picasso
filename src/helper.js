@@ -1,13 +1,30 @@
-const APP_VERSION = "1.0";
 const fs = require("fs");
 const pathLib = require("path");
 const trashLib = require("trash");
 const sizeLib = require("image-size");
 
-const videoExtensions = ["webm", "mp4"];
-
 module.exports = {
-	getImagePaths: (path) => {
+	getFolder: (path) => {
+		return new Promise((resolve, reject) => {
+			fs.readdir(path, (err, files) => {
+				if (err) return reject(err, null);
+				files = files
+					.filter((file) => supportedExts.indexOf(pathLib.extname(file).substring(1).toLowerCase()) > -1)
+					.map((file) => pathLib.join(path, file)); // Remove unsupported file and apply full path to each file
+				var settings, settingsErr;
+				fs.readFile(pathLib.join(path, ".picasso"), "utf8", (err, data) => {
+					try {
+						settings = JSON.parse(data);
+					}
+					catch (err) {
+						settingsErr = err;
+					}
+					resolve([files, settingsErr ? settingsErr : settings]);
+				});
+			});
+		});
+	},
+	getMediaPaths: (path) => {
 		return new Promise((resolve, reject) => {
 			fs.readdir(path, (err, files) => {
 				if (err) return reject(err);

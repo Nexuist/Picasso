@@ -1,9 +1,25 @@
 {
   "name": "Picasso",
-  "version": "0.2.0",
+  "author": "Andi Andreas <nexuister@gmail.com> (http://duro.me)",
+  "version": "0.9.0",
+  "description": "An image organizing desktop application",
   "main": "picasso.js",
 	"dependencies": {
 		"image-size": "~0.5.0",
 		"trash": "4.0.0"
-	}
+	},
+	"devDependencies": {
+		"electron": "1.4.2"
+	},
+	"build": {
+		"appId": "net.deplex.picasso",
+		"mac": {
+			"category": "public.app-category.utilities"
+		}
+	},
+	"scripts": {
+  	"pack": "build --dir",
+  	"dist": "build"
+	},
+	"postinstall": "install-app-deps"
 }

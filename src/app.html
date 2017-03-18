@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Picasso</title>
+	<link rel = "stylesheet" href = "https://opensource.keycdn.com/fontawesome/4.7.0/font-awesome.min.css" type = "text/css" />
+	<link rel = "stylesheet" href = "http://cdnjs.cloudflare.com/ajax/libs/bulma/0.3.1/css/bulma.min.css" type = "text/css" />
+	<link rel = "stylesheet" href = "app.css" />
+	<script src = "http://platform.twitter.com/widgets.js" async></script>
+	<script src = "https://unpkg.com/vue"></script>
+	<script src = "app.js" defer></script>
+</head>
+<body>
+	<div 
+		id = "upload" 
+		class = "hero is-fullheight is-light blur-overlay-container"
+		v-on:dragover.prevent = "blur = true" 
+		v-on:dragleave = "blur = false" 
+		v-on:drop.prevent = "folderDragged" 
+		:class = "{'blur-overlay': blur}"
+		v-if = "show"
+	>
+		<div class = "hero-body">
+			<div class = "container has-text-centered">
+				<a v-on:click = "iconClicked">
+					<img src = "../icons/Icon_256x256.png">
+				</a>
+				<h5>{{label}}</h5>
+				<br />
+				<p>Files that can be viewed: {{supportedExts.join(", ").toUpperCase()}}</p>
+				<br />
+				<p>Need help or want to send feedback?</p>
+				<br />
+				<a href = "https://twitter.com/nexuist" class = "twitter-follow-button" data-size = "large" data-dnt = "true" data-show-count = "false">Follow @nexuist</a>
+			</div>
+		</div>
+	</div>
+	<div
+		id = "main"
+		v-if = "show"
+	>
+		<p>hi</p>
+	</div>
+</body>
+</html>

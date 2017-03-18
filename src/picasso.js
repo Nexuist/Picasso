@@ -2,17 +2,14 @@ const {app, BrowserWindow, ipcMain} = require("electron");
 
 var openedWindows = 0;
 
-ipcMain.on("log", (event, arg) => console.log(arg)); // Allow logging to the console window
-
-/* Startup */
 function start() {
-	openedWindows--;
+	openedWindows++;
 	window = new BrowserWindow({
 		minWidth: 320,
 		minHeight: 240,
 		backgroundColor: "#f5f5f5"
 	});
-	window.loadURL(`file:///${__dirname}/window.html`);
+	window.loadURL(`file:///${__dirname}/app.html`);
 	window.on("close", () => openedWindows--);
 }
 

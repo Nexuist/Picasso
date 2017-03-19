@@ -1,4 +1,4 @@
-const {remote} = require("electron");
+const {remote, shells} = require("electron");
 const helper = require("./helper");
 
 let bus = new Vue();
@@ -21,6 +21,46 @@ Vue.config.keyCodes = {
 	z: 90
 };
 
+Vue.component("btn", {
+	props: ["icon", "disabled", "solid"],
+	template: `
+	<a class = "button" :class = "{'is-disabled': disabled, 'is-outlined': !solid}">
+		<span v-if = "icon" class = "icon">
+			<i :class = "'fa fa-' + icon"></i>
+		</span>
+		<slot name = "text"></slot>
+	</a>
+	`
+});
+
+Vue.component("modal", {
+	props: ["active", "name"],
+	methods: {
+		clearModal: () => bus.$emit("clearModal")
+	},
+	template: `
+	<div class = "modal" :class = "{ 'is-active': active }">
+		<div class = "modal-background"></div>
+		<div class = "modal-card">
+			<header class = "modal-card-head">
+				<p class = "modal-card-title">{{name}}</slot></p>
+				<a class = "button delete" v-on:click = "clearModal"></a>
+			</header>
+			<section class = "modal-card-body">
+				<slot name = "body"></slot>
+			</section>
+			<footer class = "modal-card-foot">
+				<slot name = "footer"></slot>
+				<br/>
+				<btn v-on:click.native = "clearModal">
+					<p slot = "text">Cancel</p>
+				</btn>
+			</footer>
+		</div>
+	</div>
+	`
+})
+
 let upload = new Vue({
 	el: "#upload",
 	data: {
@@ -29,7 +69,10 @@ let upload = new Vue({
 		label: "Drag in a folder or click the icon to manually select a folder.",
 		supportedExts: supportedExts
 	},
-	created: () => document.title = `Picasso v${bus.version}`,
+	created: () => {
+		document.title = `Picasso v${bus.version}`;
+		bus.$on("folderEmpty", () => upload.show = true);
+	},
 	methods: {
 		folderDragged: () => {
 			upload.blur = false;
@@ -65,15 +108,110 @@ let main = new Vue({
 	el: "#main",
 	data: {
 		show: false,
+		index: 0,
 		media: [],
 		currentMedia: null,
-		destinations: []
+		zoomed: false,
+		destinations: [],
+		toolbar: false,
+		modal: null,
+		inputValid: false
 	},
 	created: () => {
 		bus.$on("folderReady", (details) => {
 			main.media = details[0];
 			if (!(details[1] instanceof Error)) main.destinations = details[1].destinations;
+			main.move(0);
 			main.show = true;
 		});
+		bus.$on("clearModal", () => main.modal = null);
+	},
+	methods: {
+		setModal: (modal) => main.modal = modal,
+		modalShowing: (modal) => main.modal == modal,
+		toggleVideoPlaying: () => {
+			let video = document.querySelector("video");
+			video.paused ? video.play() : video.pause();
+		},
+		rename: () => {
+			let newNameWithoutExtension = document.querySelector("input#rename").value;
+			let oldFileURL = main.currentMedia.fileURL;
+			let newFileURL = oldFileURL.replace(main.currentMedia.name, newNameWithoutExtension);
+			helper.rename(oldFileURL, newFileURL)
+				.then(() => {
+					main.setModal(null);
+					main.media[main.index] = newFileURL; // Update cache
+					main.move(0); // Reload current image
+				})
+				.catch(alert);
+			main.setModal(null);
+		},
+		jump: () => {
+			let input = document.querySelector("input#jump");
+			main.index = input.value - 1;
+			main.move(0);
+			main.setModal(null);
+		},
+		open: () => shell.openExternal("file://" + main.currentMedia.fileURL),
+		trash: () => {
+			// trashLib args must be enclosed in array
+			helper.trash([main.media[main.index]])
+			.then(() => {
+				main.media.splice(main.index, 1);
+				main.move(0);
+			})
+			.catch(alert);
+			main.setModal(null);
+		},
+		move: (increment) => {
+			main.toolbar = false; // When the image loads, this will get set back to true
+			main.index = main.index + increment;
+			if (main.index < 0) main.index = main.media.length - 1;
+			if (main.index > main.media.length - 1) main.index = 0;
+			if (main.media.length == 0) {
+				bus.$emit("folderEmpty");
+				main.show = false;
+				return;
+			}
+			helper.getMediaDetails(main.media[main.index])
+			.then((details) => {
+				main.currentMedia = details;
+			})
+			.catch((err) => {
+				main.index = main.index - increment;
+				main.move(0);
+				alert(`Couldn't load new media: ${err}`);
+			});
+		},
+		moveToDestination: (destination) => {
+			let oldFileURL = main.currentMedia.fileURL;
+			let file = `${main.currentMedia.name}.${main.currentMedia.extension}`;
+			let newFileURL = pathLib.join(destination, file);
+			helper.rename(oldFileURL, newFileURL)
+				.then(() => {
+					main.media.splice(main.index, 1);
+					main.setModal(null);
+					main.move(0);
+				})
+				.catch(alert)
+		},
+		addDestination: () => {
+			remote.dialog.showOpenDialog(remote.getCurrentWindow(), {
+				properties: ["openDirectory"]
+			}, selectedFolders => {
+				if (selectedFolders) {
+					main.destinations = main.destinations.concat(selectedFolders);
+					main.saveSettings();
+				}
+			});
+		},
+		saveSettings: () => {
+			let settings = {
+				"version": require("./package.json").version,
+				"destinations": main.destinations
+			};
+			helper.setSettingsForFolder(main.currentFolder, settings)
+				.catch(alert);
+		},
 	}
 });

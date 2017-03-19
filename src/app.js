@@ -133,6 +133,7 @@ let main = new Vue({
 	methods: {
 		setModal: (modal) => main.modal = modal,
 		modalShowing: (modal) => main.modal == modal,
+		f: () => main.modalShowing(null),
 		toggleVideoPlaying: () => {
 			let video = document.querySelector("video");
 			video.paused ? video.play() : video.pause();

@@ -33,9 +33,23 @@
 				</div>
 			</div>
 		</div>
+	<!-- tabindex needed to make keyboard shortcuts work -->
 	<div
 		id = "main"
-		v-if = "show">
+		v-if = "show"
+		v-on:keyup.left = "f() && move(-1)" 
+		v-on:keyup.right = "f() && move(1)" 
+		v-on:keyup.space = "f() && toggleVideoPlaying()"
+		v-on:keyup.x = "modalShowing('trash') ? trash() : (f() && setModal('trash'))"
+		v-on:keyup.o = "f() && setModal('destinations')"
+		v-on:keyup.q = "f() && setModal('destinations')"
+		v-on:keyup.g = "f() && setModal('jump')"
+		v-on:keyup.r = "f() && setModal('rename')"
+		v-on:keyup.z = "f() && (zoomed = !zoomed)"
+		v-on:keyup.numeric = "modalShowing('destinations') && destinations.length >= $event.key && moveToDestination(destinations[$event.key - 1])"
+		v-on:keyup.esc = "setModal(null)"
+		tabindex = "-1"
+	>
 		<!-- Media -->
 		<img 
 			:class = "{'fitted': !zoomed, 'zoomed': zoomed}" 

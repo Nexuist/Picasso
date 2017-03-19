@@ -1,5 +1,6 @@
-const {remote, shells} = require("electron");
+const {remote, shell} = require("electron");
 const helper = require("./helper");
+const pathLib = require("path");
 
 let bus = new Vue();
 bus.version = require("./package.json").version;
@@ -92,6 +93,7 @@ let upload = new Vue({
 			});
 		},
 		selectFolder: (folder) => {
+			bus.folder = folder;
 			helper.getFolder(folder)
 			.then((details) => {
 				upload.show = false;
@@ -108,6 +110,7 @@ let main = new Vue({
 	el: "#main",
 	data: {
 		show: false,
+		folder: null,
 		index: 0,
 		media: [],
 		currentMedia: null,
@@ -119,6 +122,7 @@ let main = new Vue({
 	},
 	created: () => {
 		bus.$on("folderReady", (details) => {
+			main.folder = bus.folder;
 			main.media = details[0];
 			if (!(details[1] instanceof Error)) main.destinations = details[1].destinations;
 			main.move(0);
@@ -193,7 +197,7 @@ let main = new Vue({
 					main.setModal(null);
 					main.move(0);
 				})
-				.catch(alert)
+				.catch(alert);
 		},
 		addDestination: () => {
 			remote.dialog.showOpenDialog(remote.getCurrentWindow(), {
@@ -210,8 +214,8 @@ let main = new Vue({
 				"version": require("./package.json").version,
 				"destinations": main.destinations
 			};
-			helper.setSettingsForFolder(main.currentFolder, settings)
-				.catch(alert);
+			helper.setSettingsForFolder(main.folder, settings)
+			.catch((err) => alert("Error saving settings: " + err));
 		},
 	}
 });

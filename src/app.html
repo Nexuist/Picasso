@@ -103,18 +103,18 @@
 		</nav>
 		<!-- Modals -->
 		<modal :active = "modalShowing('trash')" name = "Delete Image">
-			<div slot = "body">
-				<p>Are you sure you want to delete '{{currentMedia && currentMedia.name}}'?</p>
+			<div slot = "body" v-if = "currentMedia">
+				<p>Are you sure you want to delete '{{currentMedia.name}}.{{currentMedia.extension}}'?</p>
 			</div>
 			<btn slot = "footer" icon = "trash" class = "is-danger" v-on:click.native = "trash">
 				<p slot = "text">Delete</p>
 			</btn>
 		</modal>
 		<modal :active = "modalShowing('rename')" name = "Rename Image">
-			<div slot = "body">
+			<div slot = "body" v-if = "currentMedia">
 				<p class = "control has-addons">
-					<input id = "rename" class = "input" type = "text" :value = "currentMedia && currentMedia.name" />
-					<a class = "button">.{{currentMedia && currentMedia.extension}}</a>
+					<input id = "rename" class = "input" type = "text" :value = "currentMedia.name" />
+					<a class = "button">.{{currentMedia.extension}}</a>
 				</p>
 			</div>
 			<btn slot = "footer" icon = "keyboard-o" class = "is-primary" v-on:click.native = "rename">
@@ -123,7 +123,15 @@
 		</modal>
 		<modal :active = "modalShowing('jump')" name = "Jump To Image">
 			<div slot = "body">
-				<input id = "jump" class = "input" type = "number" :min = "1" :max = "media.length" :class = "{'is-success': inputValid, 'is-danger': !inputValid}" :placeholder = "index + 1" v-on:change = "inputValid = $event.target.checkValidity()" />
+				<input 
+					id = "jump" 
+					class = "input"
+					type = "number" 
+					:min = "1" 
+					:max = "media.length" 
+					:class = "{'is-success': inputValid, 'is-danger': !inputValid}" 
+					:placeholder = "index + 1" 
+					v-on:change = "inputValid = $event.target.checkValidity()" />
 			</div>
 			<btn slot = "footer" class = "is-primary" :disabled = "!inputValid" v-on:click.native = "jump">
 				<p slot = "text">Jump</p>

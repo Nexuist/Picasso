@@ -14,7 +14,8 @@
 	"build": {
 		"appId": "net.deplex.picasso",
 		"mac": {
-			"category": "public.app-category.utilities"
+			"category": "public.app-category.utilities",
+			"icon": "assets/icons/icon"
 		}
 	},
 	"scripts": {

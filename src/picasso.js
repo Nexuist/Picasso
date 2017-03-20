@@ -10,6 +10,7 @@ function start() {
 		backgroundColor: "#f5f5f5"
 	});
 	window.loadURL(`file:///${__dirname}/app.html`);
+	window.webContents.openDevTools();
 	window.on("close", () => openedWindows--);
 }
 

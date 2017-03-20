@@ -62,8 +62,6 @@ Vue.component("modal", {
 	`
 });
 
-
-
 let upload = new Vue({
 	el: "#upload",
 	data: {

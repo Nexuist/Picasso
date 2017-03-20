@@ -60,7 +60,9 @@ Vue.component("modal", {
 		</div>
 	</div>
 	`
-})
+});
+
+
 
 let upload = new Vue({
 	el: "#upload",
@@ -68,7 +70,11 @@ let upload = new Vue({
 		show: true,
 		blur: false,
 		label: "Drag in a folder or click the icon to manually select a folder.",
-		supportedExts: supportedExts
+		supportedExts: supportedExts,
+		help: [
+			["a / &#8592;", "Move left"],
+			["d / &#8594;", "Move right"]
+		]
 	},
 	created: () => {
 		document.title = `Picasso v${bus.version}`;
@@ -212,7 +218,7 @@ let main = new Vue({
 		},
 		saveSettings: () => {
 			let settings = {
-				"version": require("./package.json").version,
+				"version": bus.version,
 				"destinations": main.destinations
 			};
 			helper.setSettingsForFolder(main.folder, settings)

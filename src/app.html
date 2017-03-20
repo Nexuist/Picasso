@@ -18,6 +18,26 @@
 			v-on:drop.prevent = "folderDragged" 
 			:class = "{'blur-overlay': blur}"
 			v-if = "show">
+			<modal :active = "true" name = "Keyboard Shortcuts">
+				<div slot = "body">
+					<div class = "container columns">
+						<div class = "column">
+							<ul>
+								<li v-for = "[key, desc] in help.slice().splice(0, help.length / 2)">
+									<a class = "button is-light" v-html = "key"></a> {{desc}}
+								</li>
+							</ul>
+						</div>
+						<div class = "column">
+							<ul>
+								<li v-for = "[key, desc] in help.slice().splice(help.length / 2)">
+									<a class = "button is-light" v-html = "key"></a> {{desc}}
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</modal>
 			<div class = "hero-body">
 				<div class = "container has-text-centered">
 					<a v-on:click = "iconClicked">
@@ -30,6 +50,7 @@
 					<p>Need help or want to send feedback?</p>
 					<br />
 					<a href = "https://twitter.com/nexuist" class = "twitter-follow-button" data-size = "large" data-dnt = "true" data-show-count = "false">Follow @nexuist</a>
+					<br />
 				</div>
 			</div>
 		</div>
@@ -77,6 +98,11 @@
 			</div>
 			<div class = "nav-right is-active">
 				<span class = "nav-item">
+					<btn
+						icon = "question"
+						v-on:click.native = "setModal('help')"
+						class = "is-info">
+					</btn>
 					<btn 
 						icon = "external-link" 
 						v-on:click.native = "open()" 
@@ -116,6 +142,11 @@
 			</div>
 		</nav>
 		<!-- Modals -->
+		<modal :active = "true" name = "Keyboard Shortcuts">
+			<div slot = "body">
+				<a class = "button">left</a> move left
+			</div>
+		</modal>
 		<modal :active = "modalShowing('trash')" name = "Delete Image">
 			<div slot = "body" v-if = "currentMedia">
 				<p>Are you sure you want to delete '{{currentMedia.name}}.{{currentMedia.extension}}'?</p>
@@ -157,14 +188,14 @@
 					<ul class="menu-list">
 						<li v-for = "(folder, index) in destinations">
 							<a v-on:click = "moveToDestination(folder)">
-							<b v-if = "index < 10">{{index == 9 ? 0 : index + 1}}.</b> {{folder}} <span class = "delete is-pulled-right" v-on:click.stop = "destinations.splice(index, 1); saveSettings();"></span>
+								<b v-if = "index < 10">{{index == 9 ? 0 : index + 1}}.</b> {{folder}} <span class = "delete is-pulled-right" v-on:click.stop = "destinations.splice(index, 1); saveSettings()"></span>
 							</a>
 						</li>
 					</ul>
 				</aside>
 				<p v-else>You have not set up any destinations for this folder yet.</p>
 			</div>
-			<btn slot = "footer" class = "is-primary" v-on:click.native = "addDestination()">
+			<btn slot = "footer" class = "is-primary" v-on:click.native = "addDestination">
 				<p slot = "text">Add Destination</p>
 			</btn>
 		</modal>

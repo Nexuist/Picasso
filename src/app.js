@@ -10,8 +10,6 @@ let videoExts = ["webm", "mp4"];
 Vue.config.keyCodes = {
 	numeric: [49, 50, 51, 52, 53, 54, 55, 56, 57, 48],
 	space: 32,
-	left: [65, 37],
-	right: [68, 39],
 	a: 65,
 	d: 68,
 	g: 71,
@@ -120,8 +118,8 @@ let main = new Vue({
 		modal: null,
 		inputValid: false,
 		help: [
-			["a / &#8592;", "Move left"],
-			["d / &#8594;", "Move right"],
+			["a", "Move left"],
+			["d", "Move right"],
 			["space", "Toggle video playback"],
 			["x", "Trash file"],
 			["o / q", "Open destinations"],

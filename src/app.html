@@ -18,26 +18,6 @@
 			v-on:drop.prevent = "folderDragged" 
 			:class = "{'blur-overlay': blur}"
 			v-if = "show">
-			<modal :active = "true" name = "Keyboard Shortcuts">
-				<div slot = "body">
-					<div class = "container columns">
-						<div class = "column">
-							<ul>
-								<li v-for = "[key, desc] in help.slice().splice(0, help.length / 2)">
-									<a class = "button is-light" v-html = "key"></a> {{desc}}
-								</li>
-							</ul>
-						</div>
-						<div class = "column">
-							<ul>
-								<li v-for = "[key, desc] in help.slice().splice(help.length / 2)">
-									<a class = "button is-light" v-html = "key"></a> {{desc}}
-								</li>
-							</ul>
-						</div>
-					</div>
-				</div>
-			</modal>
 			<div class = "hero-body">
 				<div class = "container has-text-centered">
 					<a v-on:click = "iconClicked">
@@ -142,9 +122,34 @@
 			</div>
 		</nav>
 		<!-- Modals -->
-		<modal :active = "true" name = "Keyboard Shortcuts">
+		<modal :active = "modalShowing('help')" name = "Keyboard Shortcuts">
 			<div slot = "body">
-				<a class = "button">left</a> move left
+				<div class = "container columns">
+					<div class = "column">
+						<ul>
+							<li class = "spaced" v-for = "[key, desc] in help.slice().splice(0, help.length / 2)">
+								<div class = "level">
+									<div class = "level-item level-left">
+										<a class = "button is-light" v-html = "key"></a> 
+									</div>
+									<span class = "level-item">{{desc}}</span>
+								</div>
+							</li>
+						</ul>
+					</div>
+					<div class = "column">
+						<ul>
+							<li class = "spaced" v-for = "[key, desc] in help.slice().splice(help.length / 2)">
+								<div class = "level">
+									<div class = "level-item level-left">
+										<a class = "button is-light" v-html = "key"></a> 
+									</div>
+									<span class = "level-item">{{desc}}</span>
+								</div>
+							</li>
+						</ul>
+					</div>
+				</div>
 			</div>
 		</modal>
 		<modal :active = "modalShowing('trash')" name = "Delete Image">

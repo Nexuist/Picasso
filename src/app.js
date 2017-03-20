@@ -70,11 +70,7 @@ let upload = new Vue({
 		show: true,
 		blur: false,
 		label: "Drag in a folder or click the icon to manually select a folder.",
-		supportedExts: supportedExts,
-		help: [
-			["a / &#8592;", "Move left"],
-			["d / &#8594;", "Move right"]
-		]
+		supportedExts: supportedExts
 	},
 	created: () => {
 		document.title = `Picasso v${bus.version}`;
@@ -124,7 +120,19 @@ let main = new Vue({
 		destinations: [],
 		toolbar: false,
 		modal: null,
-		inputValid: false
+		inputValid: false,
+		help: [
+			["a / &#8592;", "Move left"],
+			["d / &#8594;", "Move right"],
+			["space", "Toggle video playback"],
+			["x", "Trash file"],
+			["o / q", "Open destinations"],
+			["0-9", "Pick destination"],
+			["g", "Jump to file"],
+			["r", "Rename file"],
+			["z", "Toggle zoom"],
+			["esc", "Close popup"]
+		]
 	},
 	created: () => {
 		bus.$on("folderReady", (details) => {

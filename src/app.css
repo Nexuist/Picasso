@@ -45,3 +45,7 @@ body, html {
 input#rename {
 	min-width: 92%;
 }
+
+li.spaced {
+	margin-bottom: 10px;
+}
